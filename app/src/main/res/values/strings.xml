@@ -1,0 +1,48 @@
+<resources>
+    <string name="app_name">Eldroid_NullPoint</string>
+
+    <!-- ============================================================
+         Google Sign-In
+         Get this from Firebase Console > Project Settings > General
+         > Your apps > SDK setup and configuration, OR from the
+         "oauth_client" (client_type 3) entry inside google-services.json
+         after you replace it with your real file.
+         ============================================================ -->
+    <string name="default_web_client_id" translatable="false">492442490277-4kq45j740plcbqo1meel9qo5e5arlt2s.apps.googleusercontent.com</string>
+
+
+    <!-- Login screen -->
+    <string name="title_login">Welcome Back</string>
+    <string name="subtitle_login">Login to continue your journey with us</string>
+    <string name="hint_email">Email</string>
+    <string name="hint_password">Password</string>
+    <string name="forgot_password">Forgot Password?</string>
+    <string name="btn_login">Login</string>
+    <string name="or_divider">or</string>
+    <string name="btn_google">Continue with Google</string>
+    <string name="no_account">Don\'t have an account? </string>
+    <string name="sign_up">Sign up</string>
+
+    <!-- Sign up screen -->
+    <string name="title_signup">Create Account</string>
+    <string name="subtitle_signup">Sign up to get started with private coaching</string>
+    <string name="hint_first_name">First Name</string>
+    <string name="hint_last_name">Last Name</string>
+    <string name="hint_confirm_password">Confirm Password</string>
+    <string name="btn_signup">Sign Up</string>
+    <string name="have_account">Already have an account? </string>
+    <string name="log_in">Log in</string>
+    <string name="password_hint_helper">Min 8 characters, with uppercase, lowercase, number &amp; symbol</string>
+
+    <!-- Home screen -->
+    <string name="welcome_message">Welcome</string>
+    <string name="btn_logout">Log out</string>
+
+    <!-- Validation error messages -->
+    <string name="error_invalid_email">Enter a valid email address</string>
+    <string name="error_password_required">Password is required</string>
+    <string name="error_first_name_required">First name is required</string>
+    <string name="error_last_name_required">Last name is required</string>
+    <string name="error_password_weak">Use 8+ chars with upper, lower, number &amp; symbol</string>
+    <string name="error_passwords_dont_match">Passwords do not match</string>
+</resources>

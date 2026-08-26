@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="black">#FF000000</color>
+    <color name="white">#FFFFFFFF</color>
+
+    <!-- Brand palette -->
+    <color name="brand_dark_green">#16362B</color>
+    <color name="brand_green">#3E8E5A</color>
+    <color name="brand_green_light">#DCEFE2</color>
+    <color name="text_primary">#1A1F1D</color>
+    <color name="text_secondary">#8A9490</color>
+    <color name="field_background">#F4F6F5</color>
+    <color name="field_border">#E3E8E5</color>
+    <color name="field_border_focused">#3E8E5A</color>
+    <color name="error_red">#E5484D</color>
+    <color name="facebook_blue">#1877F2</color>
+    <color name="divider">#E6E9E7</color>
+</resources>
