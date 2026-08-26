@@ -4,7 +4,6 @@ import android.content.Intent
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
 import com.example.eldroid_nullpoint.databinding.ActivityHomeBinding
-import com.facebook.login.LoginManager
 import com.google.android.gms.auth.api.signin.GoogleSignIn
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions
 import com.google.firebase.auth.FirebaseAuth
@@ -60,9 +59,6 @@ class HomeActivity : AppCompatActivity() {
         // Also sign out of Google so the account picker shows again next time.
         val gso = GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN).build()
         GoogleSignIn.getClient(this, gso).signOut()
-
-        // And log out of Facebook.
-        LoginManager.getInstance().logOut()
 
         goToLogin()
     }
