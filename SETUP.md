@@ -1,25 +1,31 @@
 # Eldroid_NullPoint – Login & Sign Up Setup Guide
 
 This project contains a fully coded Login / Sign Up flow (Kotlin, View Binding,
-Firebase Auth + Firestore, Google Sign-In, Facebook Login). Everything compiles
+Firebase Auth + Firestore, Google Sign-In). Everything compiles
 and runs, but it is wired to **placeholder credentials** — you must plug in
-your own Firebase / Google / Facebook keys before the network calls will work.
+your own Firebase / Google keys before the network calls will work.
 Follow the steps below in order.
 
 ## What's included
 
-| File | Purpose |
+The code follows the **Model-View-Presenter** pattern; see `ARCHITECTURE.md`
+for the full breakdown. In short:
+
+| Package | Purpose |
 |---|---|
-| `MainActivity.kt` | Splash screen, routes to Home if already logged in, else Login |
-| `LoginActivity.kt` | Email/password login, Google login, Facebook login, "Forgot password" |
-| `SignupActivity.kt` | First/last name, email, password + confirm, strong-password validation, Google/Facebook sign up |
-| `HomeActivity.kt` | Placeholder screen after login, shows name from Firestore, Logout |
-| `util/Validators.kt` | Email format check + strong-password rule (8+ chars, upper, lower, number, symbol) |
+| `splash/` | `MainActivity` + `SplashPresenter` – routes to Home if already logged in, else Login |
+| `login/` | Email/password login, Google login, "Forgot password" |
+| `register/` | First/last name, email, password + confirm with strict validation, Google sign up |
+| `forgotpassword/` | Sends the Firebase password-reset email |
+| `changepassword/` | Re-authenticates, then updates the password (email/password accounts only) |
+| `home/` | Dashboard: name, email, provider, member since, last login, login count, Logout |
+| `data/` | `AuthRepository` interface + `FirebaseAuthRepository` (the only place Firebase Auth is called) |
+| `util/Validators.kt` | Every input rule (email, names, strong passwords, confirmation) |
 | `model/User.kt` | Firestore user document model |
 
 On successful sign up / social login, a document is written to the Firestore
 collection **`users/{uid}`** with `firstName`, `lastName`, `email`, `provider`,
-`createdAt`.
+`createdAt`, `lastLoginAt` and `loginCount`.
 
 ---
 

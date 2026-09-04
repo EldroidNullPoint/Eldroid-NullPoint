@@ -18,7 +18,7 @@
 
 
         <activity
-            android:name=".MainActivity"
+            android:name=".splash.MainActivity"
             android:exported="true"
             android:theme="@style/Theme.Eldroid_NullPoint">
             <intent-filter>
@@ -29,17 +29,17 @@
         </activity>
 
         <activity
-            android:name=".LoginActivity"
+            android:name=".login.LoginActivity"
             android:exported="false"
             android:windowSoftInputMode="adjustResize" />
 
         <activity
-            android:name=".SignupActivity"
+            android:name=".register.RegisterActivity"
             android:exported="false"
             android:windowSoftInputMode="adjustResize" />
 
         <activity
-            android:name=".HomeActivity"
+            android:name=".home.HomeActivity"
             android:exported="false" />
 
 
