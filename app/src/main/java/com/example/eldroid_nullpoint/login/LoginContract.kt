@@ -15,6 +15,8 @@ interface LoginContract {
         fun launchGoogleSignIn()
         fun navigateToHome()
         fun navigateToRegister()
+        /** Opens the Forgot Password screen, pre-filling whatever email was typed. */
+        fun navigateToForgotPassword(prefilledEmail: String)
     }
 
     interface Presenter {

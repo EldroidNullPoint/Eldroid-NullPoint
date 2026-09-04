@@ -56,30 +56,9 @@ class LoginPresenter(
         view?.showMessage(if (detail != null) "Google sign-in failed: $detail" else "Google sign-in failed.")
     }
 
-    /**
-     * Sends the reset email straight from the login screen using the email typed
-     * above. The dedicated Forgot Password screen (ForgotPasswordPresenter) will
-     * take over this action once its layout exists.
-     */
+    /** Hands off to the Forgot Password screen; the email typed here is carried over as a convenience. */
     override fun onForgotPasswordClicked(email: String) {
-        val view = view ?: return
-        view.clearFieldErrors()
-
-        val emailError = Validators.emailError(email)
-        if (emailError != null) {
-            view.showEmailError(emailError)
-            view.showMessage("Enter your email above first")
-            return
-        }
-
-        val trimmed = email.trim()
-        view.showLoading()
-        repository.sendPasswordReset(trimmed) { result ->
-            this.view?.hideLoading()
-            result
-                .onSuccess { this.view?.showMessage("Password reset email sent to $trimmed") }
-                .onFailure { this.view?.showMessage(it.message ?: "Could not send reset email") }
-        }
+        view?.navigateToForgotPassword(email.trim())
     }
 
     override fun onRegisterClicked() {

@@ -1,4 +1,10 @@
-# Architecture – Model-View-Presenter (MVP)
+# SmartDock Borrower App – Architecture (MVP)
+
+SmartDock is an IoT, RFID-based equipment borrowing system (see the team's
+Functional Requirements Specification). This Android app is the **borrower
+mobile application**: it authenticates borrowers and shows equipment
+availability, the borrower's own borrowed items with due times, and recent
+borrow/return activity synced from the SmartDock tower through Firebase.
 
 The app follows MVP strictly: every screen is a `Contract` with a `View`
 interface and a `Presenter` interface, an Activity that implements the View,
@@ -24,19 +30,24 @@ com.example.eldroid_nullpoint
 │   ├── BaseView.kt              showLoading / hideLoading / showMessage
 │   └── BasePresenter.kt         attachView / detachView + null-safe `view`
 ├── data/                        MODEL
-│   ├── AuthRepository.kt        interface the presenters depend on
+│   ├── AuthRepository.kt        auth interface the presenters depend on
 │   ├── FirebaseAuthRepository.kt production implementation (only file that imports Firebase Auth)
+│   ├── EquipmentRepository.kt   equipment + transaction interface
+│   ├── FirestoreEquipmentRepository.kt  reads equipment/ and transactions/, seeds sample boxes
 │   ├── SessionUser.kt           framework-free "who is signed in"
 │   ├── AuthError.kt             user-safe error messages
-│   └── Injection.kt             hands Activities the shared repository
-├── model/User.kt                Firestore document users/{uid}
+│   └── Injection.kt             hands Activities the shared repositories
+├── model/
+│   ├── User.kt                  Firestore document users/{uid}
+│   ├── Equipment.kt             Firestore document equipment/{id} (one monitored box)
+│   └── EquipmentTransaction.kt  Firestore document transactions/{id}
 ├── util/Validators.kt           all input rules (pure Kotlin, no android.util.Patterns)
 ├── splash/                      MainActivity + SplashPresenter  (router)
 ├── login/                       LoginActivity + LoginPresenter
 ├── register/                    RegisterActivity + RegisterPresenter
-├── forgotpassword/              ForgotPasswordPresenter (+ Activity in the UI pass)
-├── changepassword/              ChangePasswordPresenter (+ Activity in the UI pass)
-└── home/                        HomeActivity + HomePresenter + DashboardData
+├── forgotpassword/              ForgotPasswordActivity + ForgotPasswordPresenter
+├── changepassword/              ChangePasswordActivity + ChangePasswordPresenter
+└── home/                        HomeActivity + HomePresenter + DashboardData + adapters
 ```
 
 ## Responsibilities
@@ -75,11 +86,32 @@ override fun onDestroy() {
 
 ## Home / Dashboard data
 
-`HomePresenter` loads `users/{uid}` and produces a `DashboardData`:
-full name, email, initials, sign-in provider, member-since date, last login
-date/time, login count and whether the account can change its password.
-`loginCount` and `lastLoginAt` are updated on every successful login by the
-repository.
+`HomePresenter` chains four repository calls (profile -> seed sample data if
+the equipment collection is empty -> equipment -> transactions) and produces a
+single `DashboardData`:
+
+| Section | Content |
+|---|---|
+| Header | initials avatar, "Hi, {first name}!", email |
+| Overdue banner | shown only when the borrower has overdue items |
+| Stats | available boxes, borrowed boxes, the borrower's active items |
+| My borrowed items | box number, item, borrow time, "Due in 1h 20m" / "Overdue by 45m" chip |
+| Equipment availability | every box with Available / Borrowed / Yours / Overdue chip |
+| Recent activity | newest 10 borrow / return / overdue events for this borrower |
+| Account | sign-in method, member since, last login, total logins, Change Password |
+
+### Firestore collections
+
+| Collection | Written by | Fields |
+|---|---|---|
+| `users/{uid}` | the app | firstName, lastName, email, provider, createdAt, lastLoginAt, loginCount |
+| `equipment/{id}` | SmartDock tower / Cloud Functions (sample data seeded by the app) | name, category, boxNumber, status (`available`/`borrowed`), borrowedBy, borrowedByName, borrowedAt, dueAt |
+| `transactions/{id}` | SmartDock tower / Cloud Functions (sample data seeded by the app) | uid, userName, equipmentId, equipmentName, boxNumber, type (`borrow`/`return`/`overdue`/`alert`), timestamp |
+
+**Sample data:** until the ESP32 tower is connected, the first signed-in user
+to open the dashboard seeds six sample boxes and three sample transactions
+(one box is borrowed by that user, one is overdue for another borrower).
+Delete the `equipment` collection in the Firebase console to re-seed.
 
 ## Tests
 

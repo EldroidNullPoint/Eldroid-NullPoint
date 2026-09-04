@@ -15,6 +15,7 @@ class LoginPresenterTest {
         val messages = mutableListOf<String>()
         var emailError: String? = null
         var passwordError: String? = null
+        var forgotPasswordEmail: String? = null
 
         override fun showLoading() { events += "showLoading" }
         override fun hideLoading() { events += "hideLoading" }
@@ -25,6 +26,9 @@ class LoginPresenterTest {
         override fun launchGoogleSignIn() { events += "launchGoogleSignIn" }
         override fun navigateToHome() { events += "navigateToHome" }
         override fun navigateToRegister() { events += "navigateToRegister" }
+        override fun navigateToForgotPassword(prefilledEmail: String) {
+            events += "navigateToForgotPassword"; forgotPasswordEmail = prefilledEmail
+        }
     }
 
     private lateinit var repository: FakeAuthRepository
@@ -105,19 +109,20 @@ class LoginPresenterTest {
     }
 
     @Test
-    fun `forgot password requires a valid email`() {
-        presenter.onForgotPasswordClicked("nope")
+    fun `forgot password opens the reset screen with the typed email`() {
+        presenter.onForgotPasswordClicked(" jane.doe@example.com ")
 
-        assertEquals("Enter a valid email address", view.emailError)
+        assertEquals(listOf("navigateToForgotPassword"), view.events)
+        assertEquals("jane.doe@example.com", view.forgotPasswordEmail)
         assertTrue(repository.calls.isEmpty())
     }
 
     @Test
-    fun `forgot password sends reset and confirms`() {
-        presenter.onForgotPasswordClicked(" jane.doe@example.com ")
+    fun `forgot password works with an empty email`() {
+        presenter.onForgotPasswordClicked("")
 
-        assertEquals("jane.doe@example.com", repository.lastResetEmail)
-        assertEquals(listOf("Password reset email sent to jane.doe@example.com"), view.messages)
+        assertEquals("", view.forgotPasswordEmail)
+        assertTrue(view.messages.isEmpty())
     }
 
     @Test

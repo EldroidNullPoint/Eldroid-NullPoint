@@ -39,6 +39,16 @@
             android:windowSoftInputMode="adjustResize" />
 
         <activity
+            android:name=".forgotpassword.ForgotPasswordActivity"
+            android:exported="false"
+            android:windowSoftInputMode="adjustResize" />
+
+        <activity
+            android:name=".changepassword.ChangePasswordActivity"
+            android:exported="false"
+            android:windowSoftInputMode="adjustResize" />
+
+        <activity
             android:name=".home.HomeActivity"
             android:exported="false" />
 

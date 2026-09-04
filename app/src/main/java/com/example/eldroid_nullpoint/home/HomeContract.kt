@@ -6,6 +6,7 @@ interface HomeContract {
 
     interface View : BaseView {
         fun showDashboard(data: DashboardData)
+        fun navigateToChangePassword()
         fun navigateToLogin()
     }
 
@@ -13,28 +14,63 @@ interface HomeContract {
         fun attachView(view: View)
         fun detachView()
 
-        /** Loads the signed-in user's profile and pushes a [DashboardData] to the view. */
+        /** Loads profile + equipment + activity and pushes a [DashboardData] to the view. */
         fun loadDashboard()
+        fun onChangePasswordClicked()
         fun onLogoutClicked()
     }
 }
 
 /**
- * Everything the Home/Dashboard screen displays, already formatted so the View
- * just puts strings into TextViews.
+ * Everything the SmartDock borrower dashboard displays, already formatted so
+ * the View only has to put strings into widgets.
  */
 data class DashboardData(
+    // Account
     val firstName: String,
     val fullName: String,
     val email: String,
-    /** Up to two uppercase letters for an avatar, e.g. "JD". */
+    /** Up to two uppercase letters for the avatar, e.g. "JD". */
     val initials: String,
     /** "Email & password" or "Google". */
     val providerLabel: String,
-    /** Formatted account-creation date, e.g. "Sep 4, 2026". */
     val memberSince: String,
-    /** Formatted last-login date/time, or "" when unknown. */
     val lastLogin: String,
     val loginCount: Long,
-    val canChangePassword: Boolean
+    val canChangePassword: Boolean,
+    // SmartDock
+    val stats: DashboardStats,
+    val myBorrowedItems: List<EquipmentRow>,
+    val equipment: List<EquipmentRow>,
+    val recentActivity: List<ActivityRow>
+)
+
+data class DashboardStats(
+    val totalBoxes: Int,
+    val available: Int,
+    val borrowed: Int,
+    val myActive: Int,
+    val myOverdue: Int
+)
+
+enum class EquipmentStatus { AVAILABLE, BORROWED, OVERDUE }
+
+/** One row in the "My borrowed items" or "Equipment availability" lists. */
+data class EquipmentRow(
+    val id: String,
+    /** Two-digit box number, e.g. "01". */
+    val boxLabel: String,
+    val name: String,
+    /** Secondary line, e.g. "Box 1 · Audio" or "Borrowed Sep 4 at 2:10 PM". */
+    val detail: String,
+    /** Chip text, e.g. "Available", "Borrowed", "Due in 1h 20m", "Overdue by 45m". */
+    val badge: String,
+    val status: EquipmentStatus
+)
+
+/** One row in the "Recent activity" list. */
+data class ActivityRow(
+    val title: String,
+    val subtitle: String,
+    val type: String
 )

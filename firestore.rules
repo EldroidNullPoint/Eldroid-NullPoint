@@ -2,13 +2,33 @@ rules_version = '2';
 service cloud.firestore {
   match /databases/{database}/documents {
 
+    function signedIn() {
+      return request.auth != null;
+    }
+
     // Each signed-in user may only read/write their own profile document,
     // stored at users/{uid}.
     match /users/{userId} {
-      allow read: if request.auth != null && request.auth.uid == userId;
-      allow create: if request.auth != null && request.auth.uid == userId;
-      allow update: if request.auth != null && request.auth.uid == userId;
+      allow read: if signedIn() && request.auth.uid == userId;
+      allow create: if signedIn() && request.auth.uid == userId;
+      allow update: if signedIn() && request.auth.uid == userId;
       allow delete: if false;
+    }
+
+    // SmartDock boxes. Every borrower can see availability. Writes normally
+    // come from the tower / Cloud Functions; the prototype also lets a
+    // signed-in app seed sample boxes when the collection is empty.
+    match /equipment/{equipmentId} {
+      allow read: if signedIn();
+      allow create, update: if signedIn();
+      allow delete: if false;
+    }
+
+    // Borrow / return / alert history. Borrowers only read their own events.
+    match /transactions/{transactionId} {
+      allow read: if signedIn() && resource.data.uid == request.auth.uid;
+      allow create: if signedIn() && request.resource.data.uid == request.auth.uid;
+      allow update, delete: if false;
     }
   }
 }

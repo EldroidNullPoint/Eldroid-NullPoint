@@ -11,6 +11,7 @@ import androidx.appcompat.app.AppCompatActivity
 import com.example.eldroid_nullpoint.R
 import com.example.eldroid_nullpoint.data.Injection
 import com.example.eldroid_nullpoint.databinding.ActivityLoginBinding
+import com.example.eldroid_nullpoint.forgotpassword.ForgotPasswordActivity
 import com.example.eldroid_nullpoint.home.HomeActivity
 import com.example.eldroid_nullpoint.register.RegisterActivity
 import com.google.android.gms.auth.api.signin.GoogleSignIn
@@ -145,6 +146,10 @@ class LoginActivity : AppCompatActivity(), LoginContract.View {
 
     override fun navigateToRegister() {
         startActivity(Intent(this, RegisterActivity::class.java))
+    }
+
+    override fun navigateToForgotPassword(prefilledEmail: String) {
+        startActivity(ForgotPasswordActivity.newIntent(this, prefilledEmail))
     }
 
     private fun setLoading(loading: Boolean) {

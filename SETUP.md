@@ -1,6 +1,6 @@
-# Eldroid_NullPoint – Login & Sign Up Setup Guide
+# SmartDock Borrower App – Setup Guide
 
-This project contains a fully coded Login / Sign Up flow (Kotlin, View Binding,
+This is the SmartDock borrower Android app (Kotlin, MVP, View Binding,
 Firebase Auth + Firestore, Google Sign-In). Everything compiles
 and runs, but it is wired to **placeholder credentials** — you must plug in
 your own Firebase / Google keys before the network calls will work.
@@ -16,10 +16,10 @@ for the full breakdown. In short:
 | `splash/` | `MainActivity` + `SplashPresenter` – routes to Home if already logged in, else Login |
 | `login/` | Email/password login, Google login, "Forgot password" |
 | `register/` | First/last name, email, password + confirm with strict validation, Google sign up |
-| `forgotpassword/` | Sends the Firebase password-reset email |
-| `changepassword/` | Re-authenticates, then updates the password (email/password accounts only) |
-| `home/` | Dashboard: name, email, provider, member since, last login, login count, Logout |
-| `data/` | `AuthRepository` interface + `FirebaseAuthRepository` (the only place Firebase Auth is called) |
+| `forgotpassword/` | Forgot Password screen – sends the Firebase password-reset email |
+| `changepassword/` | Change Password screen – re-authenticates, then updates the password (email/password accounts only) |
+| `home/` | SmartDock dashboard: availability stats, my borrowed items with due times, equipment list, recent activity, account card, Change Password, Logout |
+| `data/` | `AuthRepository` + `EquipmentRepository` interfaces and their Firebase implementations |
 | `util/Validators.kt` | Every input rule (email, names, strong passwords, confirmation) |
 | `model/User.kt` | Firestore user document model |
 
@@ -82,11 +82,13 @@ In Firebase Console → **Authentication → Sign-in method**, enable:
 
 ## 5. Firestore
 
-1. In Firebase Console → **Firestore Database**, click "Create database" (start
-   in test mode while developing, then lock it down — see `firestore.rules` in
-   this project for a starting point).
-2. No further code changes are needed; `SignupActivity`/`LoginActivity` already
-   write to the `users` collection.
+1. In Firebase Console → **Firestore Database**, click "Create database", then
+   paste the contents of `firestore.rules` from this project into the Rules tab
+   and publish. The rules let borrowers read every `equipment` box, read only
+   their own `transactions`, and read/write only their own `users/{uid}` profile.
+2. No further code changes are needed. On the first dashboard load the app seeds
+   six sample equipment boxes and a few sample transactions so there is data to
+   show before the SmartDock tower is connected (see `ARCHITECTURE.md`).
 
 ## 6. Build & run
 

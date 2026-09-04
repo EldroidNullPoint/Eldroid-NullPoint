@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">Eldroid_NullPoint</string>
+    <string name="app_name">SmartDock</string>
 
     <!-- ============================================================
          Google Sign-In
@@ -10,10 +10,12 @@
          ============================================================ -->
     <string name="default_web_client_id" translatable="false">492442490277-4kq45j740plcbqo1meel9qo5e5arlt2s.apps.googleusercontent.com</string>
 
+    <!-- Shared -->
+    <string name="brand_tagline">SmartDock · Borrower</string>
 
     <!-- Login screen -->
     <string name="title_login">Welcome Back</string>
-    <string name="subtitle_login">Login to continue your journey with us</string>
+    <string name="subtitle_login">Log in to borrow and track school equipment</string>
     <string name="hint_email">Email</string>
     <string name="hint_password">Password</string>
     <string name="forgot_password">Forgot Password?</string>
@@ -23,19 +25,55 @@
     <string name="no_account">Don\'t have an account? </string>
     <string name="sign_up">Sign up</string>
 
-    <!-- Sign up screen -->
+    <!-- Register screen -->
     <string name="title_signup">Create Account</string>
-    <string name="subtitle_signup">Sign up to get started with private coaching</string>
+    <string name="subtitle_signup">Register as a borrower to start using SmartDock</string>
     <string name="hint_first_name">First Name</string>
     <string name="hint_last_name">Last Name</string>
     <string name="hint_confirm_password">Confirm Password</string>
     <string name="btn_signup">Sign Up</string>
     <string name="have_account">Already have an account? </string>
     <string name="log_in">Log in</string>
-    <string name="password_hint_helper">Min 8 characters, with uppercase, lowercase, number &amp; symbol</string>
+    <string name="password_hint_helper">Min 10 characters with uppercase, lowercase, number &amp; symbol. No sequences, repeats or your name.</string>
 
-    <!-- Home screen -->
+    <!-- Forgot password screen -->
+    <string name="title_forgot_password">Forgot Password?</string>
+    <string name="subtitle_forgot_password">Enter the email linked to your account and we\'ll send you a link to reset your password.</string>
+    <string name="btn_send_reset">Send Reset Link</string>
+    <string name="title_reset_sent">Check your inbox</string>
+    <string name="subtitle_reset_sent">We sent a password reset link to %1$s. Open it, choose a new password, then log in again.</string>
+    <string name="remember_password">Remember your password? </string>
+    <string name="back_to_login">Back to Login</string>
+
+    <!-- Change password screen -->
+    <string name="title_change_password">Change Password</string>
+    <string name="subtitle_change_password">Choose a strong new password for your SmartDock account.</string>
+    <string name="hint_current_password">Current Password</string>
+    <string name="hint_new_password">New Password</string>
+    <string name="hint_confirm_new_password">Confirm New Password</string>
+    <string name="btn_change_password">Update Password</string>
+    <string name="password_changed">Password updated successfully</string>
+
+    <!-- Home / dashboard screen -->
     <string name="welcome_message">Welcome</string>
+    <string name="home_greeting">Hi, %1$s!</string>
+    <string name="home_greeting_generic">Hi there!</string>
+    <string name="stat_available">Available</string>
+    <string name="stat_borrowed">Borrowed</string>
+    <string name="stat_my_items">My items</string>
+    <string name="overdue_banner">You have %1$d overdue item(s). Please return them to the SmartDock tower.</string>
+    <string name="section_my_items">My borrowed items</string>
+    <string name="empty_my_items">You have no borrowed items. Tap your RFID card at the SmartDock tower to borrow equipment.</string>
+    <string name="section_equipment">Equipment availability</string>
+    <string name="empty_equipment">No equipment boxes have been registered yet.</string>
+    <string name="section_activity">Recent activity</string>
+    <string name="empty_activity">No borrow or return activity yet.</string>
+    <string name="section_account">Account</string>
+    <string name="label_sign_in_method">Sign-in method</string>
+    <string name="label_member_since">Member since</string>
+    <string name="label_last_login">Last login</string>
+    <string name="label_login_count">Total logins</string>
+    <string name="value_unknown">—</string>
     <string name="btn_logout">Log out</string>
 
     <!-- Validation error messages -->
@@ -43,6 +81,6 @@
     <string name="error_password_required">Password is required</string>
     <string name="error_first_name_required">First name is required</string>
     <string name="error_last_name_required">Last name is required</string>
-    <string name="error_password_weak">Use 8+ chars with upper, lower, number &amp; symbol</string>
+    <string name="error_password_weak">Use 10+ chars with upper, lower, number &amp; symbol</string>
     <string name="error_passwords_dont_match">Passwords do not match</string>
 </resources>
