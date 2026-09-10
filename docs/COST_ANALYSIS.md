@@ -22,7 +22,32 @@ The team already owns one ESP32, so that line is ₱0 throughout.
 
 ---
 
-## 0. Design assumption behind this BOM
+## 0. Open decisions – for the group to weigh in on
+
+Six things in this document are **not settled** and are not mine to settle.
+Everything else follows from these.
+
+| # | Decision | Options | Who it affects |
+|---|---|---|---|
+| 1 | **How equipment is identified** | RFID tag scanned at the reader (the paper, §3.1) vs box position via IR beam (the firmware checklist, §1). This BOM prices both — see §0.1 | Bryce (firmware), whoever owns the paper |
+| 2 | **Budget tier** | Bins at ₱590/member, MDF at ₱1,061, acrylic at ₱1,448 (§8) | Everyone paying |
+| 3 | **Bin type** | Opaque parts bins (₱480 for four) vs clear drop-front shoe boxes (~₱880) — cheaper vs better-looking at the defense (§7.2) | Bryce, and anyone presenting |
+| 4 | **Four boxes or three** | Dropping to three saves ₱215; the checklist's demo script only exercises boxes 1 and 2 (§7.4) | Everyone |
+| 5 | **Equipment RFID tags** | ₱80 for four. Dropping them saves the least and contradicts the paper — but it is on the cut list (§7.4) | Whoever owns the paper |
+| 6 | **Who verifies the four prices** | Bins, FC-51s, MCP23017, RC522 — ₱960 of the ₱1,965 subtotal (§7.4) | Needs one volunteer |
+
+**The one that blocks the others is #1.** It is not a cost question — the paper
+and the firmware checklist currently describe two different machines, and
+whichever way it goes, one of those documents needs rewriting before the
+defense.
+
+**#6 is the most useful thing anyone can do today.** Every price here except the
+ESP32 is an estimate, and the verified one came in 49% high. Four searches move
+half this budget from guess to fact.
+
+---
+
+## 0.1 Design assumption behind this BOM
 
 The paper (§3.1) identifies equipment by an **RFID tag scanned at the reader**.
 `ESP32_MVP_CHECKLIST.md` §1 identifies it by **box position**, using one IR
