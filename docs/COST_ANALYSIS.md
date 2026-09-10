@@ -1,7 +1,8 @@
 # SmartDock – Cost Analysis
 
 Costing for the SmartDock prototype described in `ELDROID_NULL POINT_Paper.docx`,
-sized for a **4-box demo** with an RFID tag on every piece of equipment.
+sized for a **4-box demo** with an RFID tag on every piece of equipment and
+boxes built as **separate modules that stack**.
 
 > **Prices are estimates, not quotations.** They reflect typical Philippine
 > hobby-electronics retail (Shopee / Lazada / Makerlab / e-Gizmo) in PHP and
@@ -64,18 +65,24 @@ ESP32's own free GPIOs run out once the RC522 takes its six.
 | ☐ | Presence sensor | **FC-51** IR obstacle module, LM393, 3-pin, pot-adjustable 2–30cm | `FC-51 IR obstacle sensor` | 4 | 55 | 220 |
 | ☐ | Equipment tag | MIFARE Classic **1K**, 13.56MHz, 25mm white round sticker | `RFID sticker 13.56mhz mifare 1k` | 4 | 20 | 80 |
 | ☐ | Box wiring | 3-core stranded 24AWG, 1 m per box | `3 core wire 24awg` | 4 | 25 | 100 |
-| | **Subtotal** | | | | | **400** |
+| ☐ | Inter-box connector | JST-XH 3-pin plug + socket pair (4 boxes + 1 spare) | `JST XH 3 pin connector` | 5 | 10 | 50 |
+| | **Subtotal** | | | | | **450** |
 
 **Confirm the tag chip is MIFARE Classic 1K.** Sellers substitute NTAG213 or
 125kHz tags at the same price and neither reads on an RC522. Finding that out
 during demo week is the avoidable failure here.
 
+Every box terminates in a **JST-XH plug, not soldered-through wire**. Modules
+that stack have to come apart to be carried, and a stack wired as one harness
+cannot. Ten pesos a box buys that.
+
 **Power the FC-51 from the ESP32's 3.3V rail, not 5V.** Its digital output
 swings to whatever it is powered from, and the MCP23017 in this build runs at
 3.3V. Feeding it 5V puts 5V on an expander input.
 
-**Marginal cost per additional box: ₱100.** The checklist lists six boxes
-(`box-01`…`box-06`); completing all six adds **₱200**.
+**Marginal cost per additional box: ₱330** — ₱105 of electronics above plus
+~₱225 for the module's own shell (§4). The checklist lists six boxes
+(`box-01`…`box-06`); completing all six adds **₱660**.
 
 ## 3. Borrower cards
 
@@ -105,53 +112,95 @@ uses the first four:
 The microphone at 230mm sets the depth of every compartment; the rest fit
 inside that envelope with room to spare.
 
-### 4.2 Box dimensions
+### 4.2 Construction: separate stacking modules
 
-One carcass, **2×2 grid of four identical compartments**. Identical beats
-bespoke here — one cut size repeated, one sensor mounting jig, and any item can
-move to any box without rebuilding.
+Each box is its **own closed module**, not a compartment in a shared carcass.
+Four boxes stack two-high in two columns, capped by a controller head that
+holds the ESP32 and the reader.
 
 | | mm |
 |---|---|
-| Compartment interior (each) | **200 W × 130 H × 280 D** |
-| Overall carcass | **427 W × 287 H × 280 D** |
-| Material | 9mm MDF carcass, 3mm hardboard back |
-| Finished weight | ≈ 4 kg |
+| Compartment interior (each) | **200 W × 130 H × 289 D** |
+| Box module, outer | **224 W × 154 H × 292 D** |
+| Controller head, outer | **448 W × 100 H × 292 D** |
+| Assembled stack (2 × 2 + head) | **448 W × 408 H × 292 D** |
+| Material | 12mm MDF, 3mm hardboard backs |
+| Weight, one box | ≈ 1.5 kg |
 
-130mm of height is deliberate: tall enough for the 50mm microphone, short
-enough that an empty compartment reads clearly different from a full one.
+**Why 12mm and not the 9mm of a single carcass.** A shared carcass carries its
+load through panels that never move. Modules get lifted, separated, carried and
+restacked, and the load path runs through the joints every time. 9mm MDF splits
+when you screw into its edge grain; 12mm takes a screw reliably.
 
-### 4.3 Cut list – 9mm MDF
+The reader ends up at **408mm** — a natural tap height for someone standing at
+a table, which is the reason the head goes on top rather than behind.
+
+### 4.3 How the modules stack
+
+Five details, each solving a specific failure:
+
+| Detail | Spec | Prevents |
+|---|---|---|
+| **Load path** | Top and bottom panels full-width; side panels **between** them | Load runs top panel → side walls → bottom panel → box below, in compression through the panel faces rather than the joints |
+| **Corner blocks** | 20 × 20mm stripwood, 4 per box, glued and screwed into the vertical corners | Butt joints working loose after repeated handling; also gives the screws real material to bite |
+| **Back panel** | 3mm hardboard, glued **and** pinned on all four edges | Racking — a box with an open back folds into a parallelogram under a side push. This one panel is the single largest contributor to stack stiffness |
+| **Registration** | 2 × 8mm dowels per box, protruding 8mm from the top panel, into 8.5mm holes in the box above (front-left, back-right) | The stack sliding apart; also forces correct alignment so nobody stacks a box crooked |
+| **Feet** | 4 rubber feet, **bottom module only** | The stack walking across a table during a demo |
+
+**On load:** four boxes plus contents put roughly **5 kg** on the bottom module.
+That is far below what 12mm MDF side walls carry in compression — the panels are
+not the limit here. What actually fails on a stacked student build is joint
+racking and edge-grain screw pull-out under handling, which is what the corner
+blocks and the glued back panel address. Build those two properly and the stack
+is sound; skip them and the material thickness will not save it.
+
+**Cable routing:** a 12mm hole in the back-left corner of every module, aligned
+so they line up when stacked. Sensor wires drop down the back of the stack to
+the head, each box unplugging at its JST connector.
+
+### 4.4 Cut list – 12mm MDF
+
+Per box module, ×4:
 
 | Piece | Qty | Size (mm) |
 |---|---|---|
-| Side panel | 2 | 287 × 280 |
-| Top / bottom | 2 | 409 × 280 |
-| Vertical divider | 1 | 269 × 280 |
-| Horizontal divider | 2 | 200 × 280 |
-| Back panel *(3mm hardboard)* | 1 | 427 × 287 |
+| Top / bottom | 2 | 224 × 292 |
+| Side panel | 2 | 130 × 292 |
+| Corner block *(20×20 stripwood)* | 4 | 130 long |
+| Back panel *(3mm hardboard)* | 1 | 224 × 154 |
 
-Total 9mm area ≈ 0.58 m². **One 2ft × 4ft (610 × 1220mm) sheet covers it** with
-room for a mis-cut. Sides go outside the top and bottom; the two horizontal
-dividers sit either side of the vertical one, so no notching or joinery is
-needed — butt joints, glue, and panel pins.
+Controller head, ×1:
 
-### 4.4 Sensor mounting – the part that decides whether this works
+| Piece | Qty | Size (mm) |
+|---|---|---|
+| Top / bottom | 2 | 448 × 292 |
+| Side panel | 2 | 76 × 292 |
+| Back panel *(3mm hardboard)* | 1 | 448 × 100 |
+| Front panel *(3mm hardboard, RC522 behind it)* | 1 | 448 × 100 |
 
-Mount each FC-51 on the **back wall of its compartment, facing forward** toward
-the opening, centred, 40mm above the compartment floor. Drill a 10mm hole for
-the LED pair; the board sits behind the panel with its pot reachable.
+Total 12mm area ≈ **1.13 m²** → **two 2ft × 4ft sheets** (1.49 m²), leaving ~24%
+for mis-cuts. The head costs nothing extra in material; it comes out of the
+offcuts of the same two sheets.
+
+The RC522 reads through the 3mm hardboard front panel — at 13.56MHz with a ~5cm
+range, 3mm of board is not an obstacle. Do not put the reader behind 12mm.
+
+### 4.5 Sensor mounting – the part that decides whether this works
+
+Mount each FC-51 on the **back wall of its module, facing forward** toward the
+opening, centred, 40mm above the floor. Drill a 10mm hole for the LED pair; the
+board sits behind the panel with its pot reachable through the back.
 
 Back-facing, not ceiling-facing, and the margin is why:
 
 | | Sensor-to-item |
 |---|---|
 | Item in place, resting against the back wall | 0–60 mm |
-| Compartment empty — nothing until the front edge | 280 mm |
+| Compartment empty — nothing until the front edge | 289 mm |
 
 Set each pot to trigger at ~80mm. A ceiling mount would have had to separate
 "item present" at 105mm from "empty" at 130mm — a 25mm window per box, drifting
-with every item swap. Back-mounting turns that into a 220mm gap.
+with every item swap. Back-mounting turns that into a 229mm gap.
 
 Two follow-ons:
 
@@ -161,32 +210,38 @@ Two follow-ons:
 - **A hand reaching in will trip the sensor briefly.** The checklist's 200ms
   debounce (§ Sensor hygiene) already absorbs that — do not skip it.
 
-If a compartment still reads unreliably, the fallback is a through-beam pair
-across the opening at 20mm above the floor, which is material-independent but
-needs two aligned holes per box and a comparator.
+If a module still reads unreliably, the fallback is a through-beam pair across
+the opening at 20mm above the floor: material-independent, but two aligned
+holes per box and a comparator.
 
-### 4.5 Enclosure materials
+### 4.6 Enclosure materials
 
 | ☐ | Item | Spec | ₱ |
 |---|---|---|---|
-| ☐ | MDF sheet | 9mm, 2ft × 4ft | 400 |
-| ☐ | Hardboard back | 3mm lawanit, 2ft × 4ft | 150 |
+| ☐ | MDF sheet | 12mm, 2ft × 4ft, ×2 | 1,000 |
+| ☐ | Hardboard | 3mm lawanit, 2ft × 4ft | 150 |
+| ☐ | Stripwood | 20 × 20mm, 3 m (corner blocks) | 150 |
+| ☐ | Dowel rod | 8mm × 1 m (registration pins) | 40 |
 | ☐ | Wood glue | 250 mL PVA | 60 |
-| ☐ | Panel pins / screws | 1" × 100 | 50 |
+| ☐ | Wood screws | 1¼", 100 pcs | 80 |
+| ☐ | Rubber feet | self-adhesive, 4 pcs | 40 |
 | ☐ | Sandpaper | #120 and #220 | 40 |
-| | **Subtotal** | | **700** |
+| ☐ | Panel cutting | hardware-store panel saw, both sheets | 150 |
+| | **Subtotal** | | **1,710** |
 
-Cutting: any hardware store with a panel saw will cut the sheet to the list
-above for ₱50–150, and their cuts will be squarer than a handsaw's. Square
-matters — the dividers only sit flush if the panels are true.
+Pay for the panel-saw cuts. Modules that stack have to be square or the dowels
+will not line up, and a handsaw will not hold square across twenty panels.
 
-**Cheaper and dearer alternatives**, same dimensions throughout:
+**Alternative material**, same dimensions:
 
 | Option | ₱ | Trade-off |
 |---|---|---|
-| 5mm foam board + glue | 250 | Light and fast, will not survive the trip to campus |
-| **9mm MDF (above)** | **700** | Recommended — sturdy, cuttable anywhere |
-| 3mm laser-cut acrylic | 1,500 | Best-looking; needs a shop and lead time |
+| **12mm MDF (above)** | **1,710** | Recommended — sturdy, stackable, cuttable anywhere |
+| 5mm laser-cut acrylic | ~3,000 | Best-looking and stacks well; needs a shop and lead time |
+
+Foam board and cardboard are **no longer options**. They were viable for a
+single static carcass; they will not carry a stack or survive being taken apart
+and rebuilt between demos.
 
 ## 5. Consumables and assembly
 
@@ -217,20 +272,25 @@ system is ₱0, and the whole figure below is one-time capital.
 
 ## 7. Totals
 
-| Build | Core | Boxes | Cards | Enclosure | Misc | **Subtotal** | +10% contingency | **Total ₱** |
-|---|---|---|---|---|---|---|---|---|
-| Budget (foam board) | 1,095 | 400 | 180 | 250 | 350 | 2,275 | 228 | **2,503** |
-| **Standard (MDF)** | 1,095 | 400 | 180 | 700 | 350 | 2,725 | 273 | **2,998** |
-| Premium (acrylic) | 1,095 | 400 | 180 | 1,500 | 350 | 3,525 | 353 | **3,878** |
+| Build | Core | Boxes | Cards | Enclosure | Misc | **Subtotal** | +10% | **Total ₱** | Per member |
+|---|---|---|---|---|---|---|---|---|---|
+| **Standard (12mm MDF)** | 1,095 | 450 | 180 | 1,710 | 350 | 3,785 | 379 | **4,164** | **1,041** |
+| Premium (5mm acrylic) | 1,095 | 450 | 180 | 3,000 | 350 | 5,075 | 508 | **5,583** | 1,396 |
 
-**Recommended: the standard MDF build at ≈₱3,000**, split four ways is **₱750
-per member**. It survives being carried to and from campus, which the foam-board
-build may not, and it does not depend on a laser-cutting shop's schedule.
+**Recommended: the 12mm MDF build at ≈₱4,200**, or **₱1,041 per member**.
+
+**Stacking is what this costs.** A single fixed 2×2 carcass in 9mm MDF came to
+₱2,998. Requiring the boxes to stack raises it to ₱4,164 — **+₱1,166, or 39%** —
+and all of it lands in the enclosure: thicker material, five separate module
+shells instead of one carcass, corner blocks, dowels and connectors. The
+electronics do not change at all.
+
+What the money buys is modularity. Boxes come apart for transport, a failed
+module swaps out without touching the others, and boxes 5 and 6 bolt on later
+without rebuilding anything.
 
 The 10% contingency is not padding — expect at least one dead sensor module and
 one mis-cut panel on a first build.
-
----
 
 ## 8. Procurement notes
 
@@ -252,11 +312,17 @@ If SmartDock were deployed beyond the prototype:
 
 | Scenario | Added cost ₱ |
 |---|---|
-| One more box on the existing station | 100 |
-| Boxes 5 and 6 (completing the checklist's six) | 200 |
-| Filling the MCP23017 to 16 boxes | 1,200 |
-| A second full station (new ESP32, reader, expander) | ~1,100 + boxes + enclosure |
+| One more box module (shell, sensor, tag, wiring, connector) | 330 |
+| Boxes 5 and 6 — completing the checklist's six | 660 |
+| Filling the MCP23017 to 16 boxes (12 more) | 3,960 |
+| A second full station (head, ESP32, reader, expander) | ~1,400 + boxes |
 | One more registered borrower | 18 (one card) |
+
+A stacking module costs **₱330**, against ₱100 for a compartment in a fixed
+carcass — each new box now brings its own shell (~₱225 of material) rather than
+sharing four walls with its neighbours. That is the standing price of
+modularity, and it is worth stating in the paper: the system scales one box at
+a time with no rebuild, at a known and constant unit cost.
 
 Per-borrower cost is the headline number for a school pitch: **₱18 per student**
 once a station exists, with no recurring cloud fee.
