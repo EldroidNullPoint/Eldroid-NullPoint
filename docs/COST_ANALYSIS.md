@@ -312,33 +312,81 @@ it costs you:
 
 ### 7.2 The enclosure: bought bins, not built boxes
 
-**Open-front stackable storage bins**, four of them, plus one for the
-controller head.
+Four bins, plus one for the controller head. The category matters more than the
+price — most things sold as "storage bins" will not work here.
 
 | ☐ | Item | Spec | ₱ |
 |---|---|---|---|
-| ☐ | Storage bin ×4 | **Open-front** stackable parts/shoe bin, ≥300 × 200 × 150mm interior | 480 |
+| ☐ | Storage bin ×4 | Open-front **stacking** parts bin, PP, ≥300 × 200 × 130mm interior | 480 |
 | ☐ | Controller housing | One more bin, or a plastic project box | 100 |
 | ☐ | Mounting | Adhesive pads / velcro for sensors and boards | 60 |
 | | **Subtotal** | | **640** |
 
-**The bins must open at the front, not the top.** This is the one requirement
-that cannot bend: a top-opening crate is unreachable the moment another box
-stacks on it, which defeats the entire arrangement. Search `stackable parts
-bin` or `shoe box organizer drop front` — not `storage crate`.
+#### What to buy
 
-This substitution is not purely a compromise. Bins are **designed** to stack and
-interlock, so they solve registration, load and squareness for free — the
-corner blocks, dowels, glued shear panel and panel-saw cuts all exist only
-because MDF does not stack on its own. You also skip the entire build: no
-cutting, no gluing, no waiting on a hardware store.
+**Louvre / parts bins** — the open-fronted plastic bins used on workshop and
+hardware-store walls. Moulded PP, slanted open front, a lip on the rim that a
+second bin's base sits into.
 
-What you actually lose is the custom-fabricated look, which may matter at a
-defense, and the fixed 300 × 200 × 150mm interior instead of a size you chose.
-Confirm the 230mm microphone fits before buying four.
+> Search: `stackable parts bin`, `bin box organizer`, `tool storage bin`
+> Size: a "large" or "#4/#5" bin, roughly 350 × 200 × 150mm outside
+> Price: ₱80–200 each
 
-**Drilling the sensor hole:** plastic cracks under a spade bit. Melt a clean
-10mm hole with a soldering iron, or drill slowly with a step bit.
+They are the cheapest thing that is genuinely purpose-built for what this needs:
+stacking, and reaching in from the front.
+
+**Transparent drop-front shoe boxes** are the better-looking alternative — clear
+plastic, hinged front door, made to stack. The audience can see the item without
+opening anything, which reads well at a defense.
+
+> Search: `shoe box organizer stackable drop front`, `transparent shoe box`
+> Size: ~330 × 230 × 190mm
+> Price: ₱150–250 each — about ₱400 more across four
+
+Remove or tape back the doors for the demo; an extra motion between tap and
+removal muddies the timing you are trying to show.
+
+#### Three ways to buy the wrong thing
+
+| Trap | Why it fails |
+|---|---|
+| **Nestable, not stackable** | Many cheap bins nest — they collapse into each other to save shelf space, which is the exact opposite of holding a stack. Some do both, stacking only when rotated 180°. The listing photo must show them **stacked while full**, not nested |
+| **Top-opening crate or basket** | Unreachable the moment a box stacks on it. Already ruled out in §4, and it is the most common thing returned by a "stackable storage" search |
+| **Drawer units** | The drawer has to be pulled out to reach the item, so the sensor sees a moving drawer wall rather than the item, and every borrow gains a step |
+
+#### Size check against the actual items
+
+| Item | Needs (mm) |
+|---|---|
+| Wireless microphone | 230 long — **this sets the minimum** |
+| HDMI cable, coiled | 100 ⌀ × 40 |
+| Presentation remote | 130 × 35 × 25 |
+| 65W charger | 70 × 70 × 30 |
+
+Absolute minimum interior is **250 × 120 × 80mm**. Buy to **300 × 200 × 130mm**
+so the boxes look substantial on the table and the microphone is not a
+millimetre exercise.
+
+#### Mounting the sensor — check the plastic first
+
+| Plastic | Typical of | How to make the hole |
+|---|---|---|
+| **PP** (opaque, flexible, slightly waxy) | Parts bins | Step bit, slow. PP is tough and will not crack |
+| **PS / PET** (clear, rigid, brittle) | Shoe boxes | Cracks under a spade bit. Back the spot with masking tape and drill very slowly, or melt it with a soldering iron — ventilate, melting plastic fumes |
+
+**With clear bins, try no hole at all first.** Near-IR passes through clear
+PS and PET, so tape the FC-51 to the *outside* of the back wall and test it
+against each item. If it reads reliably, you have skipped the drilling and kept
+the bins undamaged. Watch for the wall itself reflecting back at the sensor and
+reading a permanent "present" — if that happens, drill.
+
+Whichever you buy, the bins are not purely a compromise. They are **designed**
+to stack and interlock, so registration, load and squareness come free — the
+corner blocks, dowels, glued shear panel and panel-saw cuts in §4 exist only
+because MDF does not stack on its own. You also skip the build entirely.
+
+What you lose is the custom-fabricated look, which may count at a defense, and
+a chosen interior size in place of whatever the bin happens to be.
 
 ### 7.3 Two cuts that carry real risk
 
