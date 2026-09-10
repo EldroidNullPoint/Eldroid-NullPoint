@@ -11,4 +11,17 @@
     </style>
 
     <style name="Theme.Eldroid_NullPoint" parent="Base.Theme.Eldroid_NullPoint" />
+
+    <!--
+        Landing-page-only variant. The landing screen is the one screen that uses
+        the full-bleed brand dark green, so its system bars have to match it.
+        Applied to LandingActivity in the manifest only - every other screen keeps
+        the white base theme above.
+    -->
+    <style name="Theme.Eldroid_NullPoint.Landing">
+        <item name="android:windowBackground">@color/brand_dark_green</item>
+        <item name="android:statusBarColor">@color/brand_dark_green</item>
+        <item name="android:navigationBarColor">@color/brand_dark_green</item>
+        <item name="android:windowLightStatusBar">false</item>
+    </style>
 </resources>

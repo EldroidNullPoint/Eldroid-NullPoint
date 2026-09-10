@@ -11,6 +11,17 @@
     <string name="default_web_client_id" translatable="false">492442490277-4kq45j740plcbqo1meel9qo5e5arlt2s.apps.googleusercontent.com</string>
 
 
+    <!-- Landing screen -->
+    <string name="landing_image_description">SmartDock borrower app welcome artwork</string>
+    <string name="btn_get_started">Get Started</string>
+
+    <!-- Onboarding / "How it works" flow -->
+    <string name="cd_back">Back</string>
+    <string name="btn_skip">Skip</string>
+    <string name="btn_next">Next</string>
+    <string name="btn_create_account">Create Account</string>
+    <string name="onboarding_image_description">How SmartDock works, step %1$d of %2$d</string>
+
     <!-- Login screen -->
     <string name="title_login">Welcome Back</string>
     <string name="subtitle_login">Login to continue your journey with us</string>
@@ -32,17 +43,111 @@
     <string name="btn_signup">Sign Up</string>
     <string name="have_account">Already have an account? </string>
     <string name="log_in">Log in</string>
-    <string name="password_hint_helper">Min 8 characters, with uppercase, lowercase, number &amp; symbol</string>
+    <string name="password_hint_helper">Min 8 characters, with uppercase, lowercase, number &amp; symbol, and no spaces</string>
+
+    <!-- Forgot password screen -->
+    <string name="title_forgot_password">Forgot Password</string>
+    <string name="subtitle_forgot_password">Enter the email you registered with and we\'ll send you a link to reset your password.</string>
+    <string name="btn_send_reset_link">Send Reset Link</string>
+    <string name="back_to_login">Back to Login</string>
+    <string name="reset_email_sent">Reset link sent. Check the inbox for %1$s and follow the link to set a new password.</string>
+
+    <!-- Change password screen -->
+    <string name="title_change_password">Change Password</string>
+    <string name="subtitle_change_password">Confirm your current password, then choose a new one.</string>
+    <string name="hint_current_password">Current Password</string>
+    <string name="hint_new_password">New Password</string>
+    <string name="hint_confirm_new_password">Confirm New Password</string>
+    <string name="btn_update_password">Update Password</string>
+    <string name="password_changed">Password updated successfully.</string>
+    <string name="error_current_password_required">Current password is required</string>
+    <string name="error_password_same_as_current">New password must be different from your current password</string>
+
+    <!-- Dashboard -->
+    <string name="greeting_morning">Good morning</string>
+    <string name="greeting_afternoon">Good afternoon</string>
+    <string name="greeting_evening">Good evening</string>
+    <string name="dashboard_subtitle">SmartDock borrower</string>
+    <string name="section_current_status">Current Borrowing Status</string>
+    <string name="section_equipment">Equipment Availability</string>
+    <string name="section_my_items">My Borrowed Items</string>
+    <string name="section_activity">Recent Activity</string>
+    <string name="empty_current_status">You currently have no borrowed equipment.</string>
+    <string name="empty_current_status_hint">Tap your RFID card on the SmartDock tower to borrow an item.</string>
+    <string name="empty_equipment">No equipment has been registered on the SmartDock tower yet.</string>
+    <string name="empty_activity">No activity yet. Your borrow and return history will appear here.</string>
+    <string name="error_load_dashboard">We couldn\'t load your SmartDock data. Check your connection and try again.</string>
+    <string name="btn_retry">Try Again</string>
+    <string name="action_refresh">Refresh</string>
+    <string name="action_change_password">Change password</string>
+    <string name="action_logout">Log out</string>
+    <string name="rfid_notice">Borrowing and returning happen at the SmartDock tower using your RFID card. This screen shows the live status.</string>
+    <string name="see_all">See all</string>
+    <string name="demo_subtitle">Sample data - no equipment registered yet</string>
+    <string name="available_count">%1$d of %2$d available</string>
+
+    <!-- Equipment list / history screens -->
+    <string name="title_equipment_list">Equipment</string>
+    <string name="title_activity_history">My Activity</string>
+    <string name="subtitle_equipment_list">Live status of every SmartDock box</string>
+    <string name="subtitle_activity_history">Your complete borrow and return history</string>
+
+    <!-- Equipment detail -->
+    <string name="title_equipment_detail">Equipment Details</string>
+    <string name="detail_category">Category</string>
+    <string name="detail_box">SmartDock box</string>
+    <string name="detail_status">Status</string>
+    <string name="detail_borrowed_at">Borrowed at</string>
+    <string name="detail_due_at">Due at</string>
+    <string name="detail_holder">Currently with</string>
+    <string name="detail_holder_you">You</string>
+    <string name="detail_holder_other">Another borrower</string>
+    <string name="detail_hint_borrow">This item is in its box. Tap your RFID card on the SmartDock tower, then take it from Box %1$d.</string>
+    <string name="detail_hint_return">Tap your RFID card on the tower, then place this item back in Box %1$d to return it.</string>
+    <string name="detail_hint_unavailable">This item is currently borrowed. It will show as available here as soon as it is returned to Box %1$d.</string>
+    <string name="detail_hint_overdue">This item is overdue. Please return it to Box %1$d as soon as possible - overdue items are escalated to the administrator.</string>
+    <string name="detail_not_found">This equipment is no longer registered on the SmartDock tower.</string>
+
+    <!-- RFID card registration status -->
+    <string name="rfid_card_registered">RFID card registered</string>
+    <string name="rfid_card_missing">No RFID card linked to your account</string>
+    <string name="rfid_card_missing_hint">Ask the equipment room administrator to register your card before borrowing.</string>
+    <string name="box_label">Box %1$d</string>
+    <string name="status_available">Available</string>
+    <string name="status_borrowed">Borrowed</string>
+    <string name="status_yours">Yours</string>
+    <string name="status_overdue">Overdue</string>
+    <string name="label_borrowed_at">Borrowed</string>
+    <string name="label_due_at">Due</string>
+    <string name="activity_borrowed">Borrowed %1$s</string>
+    <string name="activity_returned">Returned %1$s</string>
+    <string name="activity_overdue">%1$s is overdue</string>
+    <string name="activity_alert">Alert for %1$s</string>
 
     <!-- Home screen -->
     <string name="welcome_message">Welcome</string>
     <string name="btn_logout">Log out</string>
 
     <!-- Validation error messages -->
+    <string name="error_email_required">Email is required</string>
     <string name="error_invalid_email">Enter a valid email address</string>
     <string name="error_password_required">Password is required</string>
     <string name="error_first_name_required">First name is required</string>
     <string name="error_last_name_required">Last name is required</string>
+    <string name="error_first_name_invalid">Enter a valid first name</string>
+    <string name="error_last_name_invalid">Enter a valid last name</string>
     <string name="error_password_weak">Use 8+ chars with upper, lower, number &amp; symbol</string>
     <string name="error_passwords_dont_match">Passwords do not match</string>
+    <string name="error_confirm_password_required">Please confirm your password</string>
+
+    <!-- Friendly authentication failures -->
+    <string name="auth_error_invalid_credentials">Incorrect email or password. Please try again.</string>
+    <string name="auth_error_email_in_use">That email is already registered. Try logging in instead.</string>
+    <string name="auth_error_user_not_found">We couldn\'t find an account for that email.</string>
+    <string name="auth_error_too_many_requests">Too many attempts. Please wait a moment and try again.</string>
+    <string name="auth_error_network">No internet connection. Check your network and try again.</string>
+    <string name="auth_error_weak_password">That password is too weak. Please choose a stronger one.</string>
+    <string name="auth_error_invalid_email">That email address looks invalid.</string>
+    <string name="auth_error_requires_recent_login">For your security, please log in again before changing your password.</string>
+    <string name="auth_error_generic">Something went wrong. Please try again.</string>
 </resources>

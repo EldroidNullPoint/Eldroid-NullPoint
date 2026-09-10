@@ -4,11 +4,14 @@ import android.content.Intent
 import android.os.Bundle
 import android.text.method.HideReturnsTransformationMethod
 import android.text.method.PasswordTransformationMethod
+import android.view.View
 import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.widget.doOnTextChanged
 import com.example.eldroid_nullpoint.databinding.ActivityLoginBinding
 import com.example.eldroid_nullpoint.model.User
+import com.example.eldroid_nullpoint.util.AuthErrors
 import com.example.eldroid_nullpoint.util.Validators
 import com.google.android.gms.auth.api.signin.GoogleSignIn
 import com.google.android.gms.auth.api.signin.GoogleSignInClient
@@ -28,15 +31,23 @@ class LoginActivity : AppCompatActivity() {
 
     private var isPasswordVisible = false
 
+    /** Guards against a second submission while a request is already in flight. */
+    private var isSubmitting = false
+
     private val googleSignInLauncher =
         registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
             val task = GoogleSignIn.getSignedInAccountFromIntent(result.data)
             try {
                 val account = task.getResult(ApiException::class.java)
-                account?.idToken?.let { firebaseAuthWithGoogle(it) }
+                val idToken = account?.idToken
+                if (idToken != null) {
+                    firebaseAuthWithGoogle(idToken)
+                } else {
+                    setLoading(false)
+                }
             } catch (e: ApiException) {
                 setLoading(false)
-                Toast.makeText(this, "Google sign-in failed: ${e.message}", Toast.LENGTH_LONG).show()
+                Toast.makeText(this, getString(R.string.auth_error_generic), Toast.LENGTH_LONG).show()
             }
         }
 
@@ -68,15 +79,24 @@ class LoginActivity : AppCompatActivity() {
 
         binding.btnLogin.setOnClickListener { attemptLogin() }
 
-        binding.tvForgotPassword.setOnClickListener { sendPasswordReset() }
+        binding.tvForgotPassword.setOnClickListener { goToForgotPassword() }
 
         binding.btnGoogleLogin.setOnClickListener {
+            if (isSubmitting) return@setOnClickListener
             setLoading(true)
             googleSignInLauncher.launch(googleSignInClient.signInIntent)
         }
 
         binding.tvGoToSignup.setOnClickListener {
             startActivity(Intent(this, SignupActivity::class.java))
+        }
+
+        // Errors clear as soon as the borrower starts correcting the field.
+        binding.etEmail.doOnTextChanged { _, _, _, _ ->
+            binding.tvEmailError.visibility = View.GONE
+        }
+        binding.etPassword.doOnTextChanged { _, _, _, _ ->
+            binding.tvPasswordError.visibility = View.GONE
         }
     }
 
@@ -97,23 +117,32 @@ class LoginActivity : AppCompatActivity() {
     // ---------------------------------------------------------------
 
     private fun attemptLogin() {
-        binding.tvEmailError.visibility = android.view.View.GONE
-        binding.tvPasswordError.visibility = android.view.View.GONE
+        if (isSubmitting) return
 
+        binding.tvEmailError.visibility = View.GONE
+        binding.tvPasswordError.visibility = View.GONE
+
+        // Accidental leading/trailing spaces are stripped, and the trimmed value is
+        // written back so the borrower sees exactly what is being submitted.
         val email = binding.etEmail.text.toString().trim()
+        if (email != binding.etEmail.text.toString()) {
+            binding.etEmail.setText(email)
+            binding.etEmail.setSelection(email.length)
+        }
         val password = binding.etPassword.text.toString()
 
         var isValid = true
 
-        if (!Validators.isValidEmail(email)) {
-            binding.tvEmailError.text = getString(R.string.error_invalid_email)
-            binding.tvEmailError.visibility = android.view.View.VISIBLE
+        if (email.isBlank()) {
+            showError(binding.tvEmailError, getString(R.string.error_email_required))
+            isValid = false
+        } else if (!Validators.isValidEmail(email)) {
+            showError(binding.tvEmailError, getString(R.string.error_invalid_email))
             isValid = false
         }
 
         if (password.isBlank()) {
-            binding.tvPasswordError.text = getString(R.string.error_password_required)
-            binding.tvPasswordError.visibility = android.view.View.VISIBLE
+            showError(binding.tvPasswordError, getString(R.string.error_password_required))
             isValid = false
         }
 
@@ -122,41 +151,28 @@ class LoginActivity : AppCompatActivity() {
         setLoading(true)
         auth.signInWithEmailAndPassword(email, password)
             .addOnCompleteListener { task ->
-                setLoading(false)
                 if (task.isSuccessful) {
                     goToHome()
                 } else {
-                    Toast.makeText(
-                        this,
-                        task.exception?.localizedMessage ?: "Login failed. Please try again.",
-                        Toast.LENGTH_LONG
-                    ).show()
+                    setLoading(false)
+                    // Shown inline on the password field rather than as a raw
+                    // Firebase message, so the borrower knows what to correct.
+                    showError(
+                        binding.tvPasswordError,
+                        AuthErrors.signInMessageFor(this, task.exception)
+                    )
                 }
             }
     }
 
-    private fun sendPasswordReset() {
-        val email = binding.etEmail.text.toString().trim()
-        if (!Validators.isValidEmail(email)) {
-            binding.tvEmailError.text = getString(R.string.error_invalid_email)
-            binding.tvEmailError.visibility = android.view.View.VISIBLE
-            Toast.makeText(this, "Enter your email above first", Toast.LENGTH_SHORT).show()
-            return
-        }
-        setLoading(true)
-        auth.sendPasswordResetEmail(email)
-            .addOnCompleteListener { task ->
-                setLoading(false)
-                if (task.isSuccessful) {
-                    Toast.makeText(this, "Password reset email sent to $email", Toast.LENGTH_LONG).show()
-                } else {
-                    Toast.makeText(
-                        this,
-                        task.exception?.localizedMessage ?: "Could not send reset email",
-                        Toast.LENGTH_LONG
-                    ).show()
-                }
-            }
+    private fun goToForgotPassword() {
+        val intent = Intent(this, ForgotPasswordActivity::class.java)
+        // Pre-fill whatever email has already been typed here.
+        intent.putExtra(
+            ForgotPasswordActivity.EXTRA_EMAIL,
+            binding.etEmail.text.toString().trim()
+        )
+        startActivity(intent)
     }
 
     // ---------------------------------------------------------------
@@ -181,7 +197,7 @@ class LoginActivity : AppCompatActivity() {
                     setLoading(false)
                     Toast.makeText(
                         this,
-                        task.exception?.localizedMessage ?: "Google sign-in failed",
+                        AuthErrors.messageFor(this, task.exception),
                         Toast.LENGTH_LONG
                     ).show()
                 }
@@ -192,6 +208,11 @@ class LoginActivity : AppCompatActivity() {
     // ---------------------------------------------------------------
     // Shared helpers
     // ---------------------------------------------------------------
+
+    private fun showError(view: android.widget.TextView, message: String) {
+        view.text = message
+        view.visibility = View.VISIBLE
+    }
 
     private fun splitDisplayName(displayName: String?): Pair<String, String> {
         if (displayName.isNullOrBlank()) return "" to ""
@@ -245,7 +266,8 @@ class LoginActivity : AppCompatActivity() {
     }
 
     private fun setLoading(loading: Boolean) {
-        binding.progressBar.visibility = if (loading) android.view.View.VISIBLE else android.view.View.GONE
+        isSubmitting = loading
+        binding.progressBar.visibility = if (loading) View.VISIBLE else View.GONE
         binding.btnLogin.isEnabled = !loading
         binding.btnLogin.text = if (loading) "" else getString(R.string.btn_login)
         binding.btnGoogleLogin.isEnabled = !loading

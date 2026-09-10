@@ -1,0 +1,141 @@
+<?xml version="1.0" encoding="utf-8"?><!--
+    Single layout shared by all six onboarding steps. OnboardingActivity swaps the
+    artwork and toggles the bottom controls instead of inflating six near-identical
+    screens.
+
+    Steps 1-5: "Skip" top-right + "Next" at the bottom.
+    Step 6:    no Skip/Next - "Create Account" plus the log-in link instead.
+
+    The artwork already contains its own step number, title and description, so
+    nothing here repeats that text.
+-->
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/onboardingRoot"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/white"
+    android:orientation="vertical"
+    android:paddingHorizontal="28dp"
+    android:paddingTop="8dp"
+    android:paddingBottom="28dp"
+    tools:context=".OnboardingActivity">
+
+    <!--
+        Back on the left, Skip on the right. Back is on every step so the borrower
+        can re-read an earlier one; from step 1 it leaves for the Landing page.
+        Skip is kept INVISIBLE rather than GONE on the last step so the artwork
+        does not jump upwards between step 5 and step 6.
+    -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="center_vertical"
+        android:orientation="horizontal">
+
+        <ImageView
+            android:id="@+id/btnBack"
+            android:layout_width="36dp"
+            android:layout_height="36dp"
+            android:background="?attr/selectableItemBackgroundBorderless"
+            android:contentDescription="@string/cd_back"
+            android:padding="6dp"
+            android:src="@drawable/ic_back" />
+
+        <Space
+            android:layout_width="0dp"
+            android:layout_height="1dp"
+            android:layout_weight="1" />
+
+        <TextView
+            android:id="@+id/tvSkip"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:background="?attr/selectableItemBackgroundBorderless"
+            android:fontFamily="sans-serif-medium"
+            android:gravity="center"
+            android:minWidth="48dp"
+            android:minHeight="36dp"
+            android:paddingHorizontal="8dp"
+            android:text="@string/btn_skip"
+            android:textColor="@color/brand_dark_green"
+            android:textSize="15sp" />
+    </LinearLayout>
+
+    <!--
+        adjustViewBounds + fitCenter keeps every PNG at its native aspect ratio and
+        only ever scales it down, so nothing is stretched or cropped. The weight
+        lets it give up height first on short devices.
+    -->
+    <ImageView
+        android:id="@+id/ivOnboarding"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        android:layout_marginTop="4dp"
+        android:adjustViewBounds="true"
+        android:scaleType="fitCenter"
+        tools:src="@drawable/onboarding_1" />
+
+    <!-- Steps 1-5 -->
+    <Button
+        android:id="@+id/btnNext"
+        android:layout_width="match_parent"
+        android:layout_height="56dp"
+        android:layout_marginTop="24dp"
+        android:background="@drawable/selector_button_primary"
+        android:elevation="0dp"
+        android:text="@string/btn_next"
+        android:textAllCaps="false"
+        android:textColor="@color/white"
+        android:textSize="16sp"
+        android:textStyle="bold" />
+
+    <!-- Step 6 only -->
+    <LinearLayout
+        android:id="@+id/authActions"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="24dp"
+        android:orientation="vertical"
+        android:visibility="gone">
+
+        <Button
+            android:id="@+id/btnCreateAccount"
+            android:layout_width="match_parent"
+            android:layout_height="56dp"
+            android:background="@drawable/selector_button_primary"
+            android:elevation="0dp"
+            android:text="@string/btn_create_account"
+            android:textAllCaps="false"
+            android:textColor="@color/white"
+            android:textSize="16sp"
+            android:textStyle="bold" />
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="18dp"
+            android:gravity="center"
+            android:orientation="horizontal">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/have_account"
+                android:textColor="@color/text_secondary"
+                android:textSize="14sp" />
+
+            <TextView
+                android:id="@+id/tvGoToLogin"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:background="?attr/selectableItemBackgroundBorderless"
+                android:text="@string/log_in"
+                android:textColor="@color/brand_dark_green"
+                android:textSize="14sp"
+                android:textStyle="bold" />
+        </LinearLayout>
+    </LinearLayout>
+
+</LinearLayout>

@@ -5,11 +5,15 @@ import android.os.Bundle
 import android.text.method.HideReturnsTransformationMethod
 import android.text.method.PasswordTransformationMethod
 import android.view.View
+import android.widget.EditText
+import android.widget.TextView
 import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.widget.doOnTextChanged
 import com.example.eldroid_nullpoint.databinding.ActivitySignupBinding
 import com.example.eldroid_nullpoint.model.User
+import com.example.eldroid_nullpoint.util.AuthErrors
 import com.example.eldroid_nullpoint.util.Validators
 import com.google.android.gms.auth.api.signin.GoogleSignIn
 import com.google.android.gms.auth.api.signin.GoogleSignInClient
@@ -30,15 +34,23 @@ class SignupActivity : AppCompatActivity() {
     private var isPasswordVisible = false
     private var isConfirmPasswordVisible = false
 
+    /** Guards against a second submission while a request is already in flight. */
+    private var isSubmitting = false
+
     private val googleSignInLauncher =
         registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
             val task = GoogleSignIn.getSignedInAccountFromIntent(result.data)
             try {
                 val account = task.getResult(ApiException::class.java)
-                account?.idToken?.let { firebaseAuthWithGoogle(it) }
+                val idToken = account?.idToken
+                if (idToken != null) {
+                    firebaseAuthWithGoogle(idToken)
+                } else {
+                    setLoading(false)
+                }
             } catch (e: ApiException) {
                 setLoading(false)
-                Toast.makeText(this, "Google sign-in failed: ${e.message}", Toast.LENGTH_LONG).show()
+                Toast.makeText(this, getString(R.string.auth_error_generic), Toast.LENGTH_LONG).show()
             }
         }
 
@@ -94,11 +106,23 @@ class SignupActivity : AppCompatActivity() {
         binding.btnSignup.setOnClickListener { attemptSignup() }
 
         binding.btnGoogleSignup.setOnClickListener {
+            if (isSubmitting) return@setOnClickListener
             setLoading(true)
             googleSignInLauncher.launch(googleSignInClient.signInIntent)
         }
 
         binding.tvGoToLogin.setOnClickListener { finish() }
+
+        // Each error clears as soon as the borrower starts correcting that field.
+        clearErrorOnEdit(binding.etFirstName, binding.tvFirstNameError)
+        clearErrorOnEdit(binding.etLastName, binding.tvLastNameError)
+        clearErrorOnEdit(binding.etEmail, binding.tvEmailError)
+        clearErrorOnEdit(binding.etPassword, binding.tvPasswordError)
+        clearErrorOnEdit(binding.etConfirmPassword, binding.tvConfirmPasswordError)
+    }
+
+    private fun clearErrorOnEdit(field: EditText, errorView: TextView) {
+        field.doOnTextChanged { _, _, _, _ -> errorView.visibility = View.GONE }
     }
 
     // ---------------------------------------------------------------
@@ -106,47 +130,65 @@ class SignupActivity : AppCompatActivity() {
     // ---------------------------------------------------------------
 
     private fun attemptSignup() {
+        if (isSubmitting) return
         clearErrors()
 
-        val firstName = binding.etFirstName.text.toString().trim()
-        val lastName = binding.etLastName.text.toString().trim()
-        val email = binding.etEmail.text.toString().trim()
+        // Names and email are trimmed and written back, so the borrower sees the
+        // exact value being registered. Passwords are never trimmed.
+        val firstName = trimInPlace(binding.etFirstName)
+        val lastName = trimInPlace(binding.etLastName)
+        val email = trimInPlace(binding.etEmail)
         val password = binding.etPassword.text.toString()
         val confirmPassword = binding.etConfirmPassword.text.toString()
 
         var isValid = true
 
-        if (!Validators.isValidName(firstName)) {
-            binding.tvFirstNameError.text = getString(R.string.error_first_name_required)
-            binding.tvFirstNameError.visibility = View.VISIBLE
+        if (firstName.isBlank()) {
+            showError(binding.tvFirstNameError, getString(R.string.error_first_name_required))
+            isValid = false
+        } else if (!Validators.isValidName(firstName)) {
+            // Rejects values made only of digits or symbols, and 1-character names.
+            showError(binding.tvFirstNameError, getString(R.string.error_first_name_invalid))
             isValid = false
         }
 
-        if (!Validators.isValidName(lastName)) {
-            binding.tvLastNameError.text = getString(R.string.error_last_name_required)
-            binding.tvLastNameError.visibility = View.VISIBLE
+        if (lastName.isBlank()) {
+            showError(binding.tvLastNameError, getString(R.string.error_last_name_required))
+            isValid = false
+        } else if (!Validators.isValidName(lastName)) {
+            showError(binding.tvLastNameError, getString(R.string.error_last_name_invalid))
             isValid = false
         }
 
-        if (!Validators.isValidEmail(email)) {
-            binding.tvEmailError.text = getString(R.string.error_invalid_email)
-            binding.tvEmailError.visibility = View.VISIBLE
+        if (email.isBlank()) {
+            showError(binding.tvEmailError, getString(R.string.error_email_required))
+            isValid = false
+        } else if (!Validators.isValidEmail(email)) {
+            showError(binding.tvEmailError, getString(R.string.error_invalid_email))
             isValid = false
         }
 
         val passwordError = Validators.passwordStrengthError(password)
         if (passwordError != null) {
-            binding.tvPasswordError.text = passwordError
-            binding.tvPasswordError.visibility = View.VISIBLE
+            showError(binding.tvPasswordError, passwordError)
             isValid = false
         }
 
-        if (password != confirmPassword) {
-            binding.tvConfirmPasswordError.text = getString(R.string.error_passwords_dont_match)
-            binding.tvConfirmPasswordError.visibility = View.VISIBLE
+        if (confirmPassword.isBlank()) {
+            showError(
+                binding.tvConfirmPasswordError,
+                getString(R.string.error_confirm_password_required)
+            )
+            isValid = false
+        } else if (password != confirmPassword) {
+            showError(
+                binding.tvConfirmPasswordError,
+                getString(R.string.error_passwords_dont_match)
+            )
             isValid = false
         }
 
+        // The account is only created once every local rule above passes.
         if (!isValid) return
 
         setLoading(true)
@@ -164,13 +206,30 @@ class SignupActivity : AppCompatActivity() {
                     saveUserProfile(user)
                 } else {
                     setLoading(false)
-                    Toast.makeText(
-                        this,
-                        task.exception?.localizedMessage ?: "Sign up failed. Please try again.",
-                        Toast.LENGTH_LONG
-                    ).show()
+                    // A duplicate email is reported inline on the email field;
+                    // anything else falls back to a short, non-technical toast.
+                    val exception = task.exception
+                    val message = AuthErrors.messageFor(this, exception)
+                    if (exception is com.google.firebase.auth.FirebaseAuthUserCollisionException ||
+                        exception is com.google.firebase.auth.FirebaseAuthInvalidCredentialsException
+                    ) {
+                        showError(binding.tvEmailError, message)
+                    } else {
+                        Toast.makeText(this, message, Toast.LENGTH_LONG).show()
+                    }
                 }
             }
+    }
+
+    /** Trims a field, writes the trimmed value back and returns it. */
+    private fun trimInPlace(field: EditText): String {
+        val raw = field.text.toString()
+        val trimmed = raw.trim()
+        if (raw != trimmed) {
+            field.setText(trimmed)
+            field.setSelection(trimmed.length)
+        }
+        return trimmed
     }
 
     private fun saveUserProfile(user: User) {
@@ -182,6 +241,11 @@ class SignupActivity : AppCompatActivity() {
                 // so let the user in; the profile can be retried/synced later if needed.
                 goToHome()
             }
+    }
+
+    private fun showError(view: TextView, message: String) {
+        view.text = message
+        view.visibility = View.VISIBLE
     }
 
     private fun clearErrors() {
@@ -214,7 +278,7 @@ class SignupActivity : AppCompatActivity() {
                     setLoading(false)
                     Toast.makeText(
                         this,
-                        task.exception?.localizedMessage ?: "Google sign-in failed",
+                        AuthErrors.messageFor(this, task.exception),
                         Toast.LENGTH_LONG
                     ).show()
                 }
@@ -250,6 +314,8 @@ class SignupActivity : AppCompatActivity() {
         userDocRef.get()
             .addOnSuccessListener { snapshot ->
                 setLoading(false)
+                // Never overwrite an existing profile - that would clobber fields
+                // the administrator side owns, such as rfidCardUid.
                 if (!snapshot.exists()) {
                     val user = User(
                         uid = uid,
@@ -276,6 +342,7 @@ class SignupActivity : AppCompatActivity() {
     }
 
     private fun setLoading(loading: Boolean) {
+        isSubmitting = loading
         binding.progressBar.visibility = if (loading) View.VISIBLE else View.GONE
         binding.btnSignup.isEnabled = !loading
         binding.btnSignup.text = if (loading) "" else getString(R.string.btn_signup)

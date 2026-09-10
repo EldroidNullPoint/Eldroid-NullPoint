@@ -8,8 +8,8 @@ import androidx.appcompat.app.AppCompatActivity
 import com.google.firebase.auth.FirebaseAuth
 
 /**
- * Splash / router activity. Decides whether the user should land on the
- * Home screen (already logged in) or the Login screen.
+ * Splash / router activity. Decides whether the borrower should land on the
+ * Home dashboard (session already exists) or the Landing page.
  */
 class MainActivity : AppCompatActivity() {
 
@@ -25,10 +25,12 @@ class MainActivity : AppCompatActivity() {
 
     private fun routeToNextScreen() {
         val currentUser = FirebaseAuth.getInstance().currentUser
+        // Signed-out borrowers see the Landing page first; an existing session
+        // still goes straight to the dashboard.
         val destination = if (currentUser != null) {
             Intent(this, HomeActivity::class.java)
         } else {
-            Intent(this, LoginActivity::class.java)
+            Intent(this, LandingActivity::class.java)
         }
         startActivity(destination)
         finish()

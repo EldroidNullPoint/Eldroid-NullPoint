@@ -28,6 +28,17 @@
             </intent-filter>
         </activity>
 
+        <!-- Landing is the only screen using the full dark-green theme variant. -->
+        <activity
+            android:name=".LandingActivity"
+            android:exported="false"
+            android:theme="@style/Theme.Eldroid_NullPoint.Landing" />
+
+        <!-- "How it works" tutorial, entered from Landing's Get Started button. -->
+        <activity
+            android:name=".OnboardingActivity"
+            android:exported="false" />
+
         <activity
             android:name=".LoginActivity"
             android:exported="false"
@@ -39,7 +50,29 @@
             android:windowSoftInputMode="adjustResize" />
 
         <activity
+            android:name=".ForgotPasswordActivity"
+            android:exported="false"
+            android:windowSoftInputMode="adjustResize" />
+
+        <activity
+            android:name=".ChangePasswordActivity"
+            android:exported="false"
+            android:windowSoftInputMode="adjustResize" />
+
+        <activity
             android:name=".HomeActivity"
+            android:exported="false" />
+
+        <activity
+            android:name=".EquipmentListActivity"
+            android:exported="false" />
+
+        <activity
+            android:name=".ActivityHistoryActivity"
+            android:exported="false" />
+
+        <activity
+            android:name=".EquipmentDetailActivity"
             android:exported="false" />
 
 

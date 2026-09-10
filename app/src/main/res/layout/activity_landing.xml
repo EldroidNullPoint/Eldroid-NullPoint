@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="utf-8"?><!--
+    Landing page. The whole screen uses the existing brand dark green
+    (@color/brand_dark_green) and the supplied drawable/landingpage artwork is the
+    dominant content, with a single white "Get Started" button pinned to the bottom.
+-->
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/landingRoot"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/brand_dark_green"
+    android:orientation="vertical"
+    android:paddingHorizontal="28dp"
+    android:paddingTop="16dp"
+    android:paddingBottom="28dp"
+    tools:context=".LandingActivity">
+
+    <!--
+        adjustViewBounds + fitCenter keeps the PNG at its native aspect ratio and
+        simply scales it down to fit; it is never stretched or cropped.
+    -->
+    <ImageView
+        android:id="@+id/ivLanding"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        android:adjustViewBounds="true"
+        android:contentDescription="@string/landing_image_description"
+        android:scaleType="fitCenter"
+        android:src="@drawable/landingpage" />
+
+    <LinearLayout
+        android:id="@+id/btnGetStarted"
+        android:layout_width="match_parent"
+        android:layout_height="56dp"
+        android:layout_marginTop="28dp"
+        android:background="@drawable/bg_button_white"
+        android:clickable="true"
+        android:focusable="true"
+        android:foreground="?attr/selectableItemBackground"
+        android:gravity="center"
+        android:orientation="horizontal">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/btn_get_started"
+            android:textColor="@color/brand_dark_green"
+            android:textSize="16sp"
+            android:textStyle="bold" />
+
+        <ImageView
+            android:layout_width="20dp"
+            android:layout_height="20dp"
+            android:layout_marginStart="10dp"
+            android:contentDescription="@null"
+            android:src="@drawable/ic_arrow_forward" />
+    </LinearLayout>
+
+</LinearLayout>

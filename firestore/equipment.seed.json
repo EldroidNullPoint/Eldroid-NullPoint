@@ -1,0 +1,121 @@
+{
+  "_comment": [
+    "Reference data for the shared `equipment` collection - the SmartDock boxes a",
+    "school typically lends to faculty and students. The app NEVER writes these:",
+    "create them once from the Firebase console (or the admin/tower side), using the",
+    "object key as the document ID.",
+    "",
+    "Every item here is small enough to fit inside a SmartDock box and be sensed by",
+    "the item-presence sensor. Bulky equipment (TVs, monitors) is not lendable",
+    "through the tower and is deliberately absent.",
+    "",
+    "Field contract: name (String), category (String), boxNumber (Integer),",
+    "status ('available' | 'borrowed'), borrowedBy (String uid or ''),",
+    "borrowedByName (String or ''), borrowedAt (Long epoch millis or 0),",
+    "dueAt (Long epoch millis or 0).",
+    "",
+    "The borrower app picks each thumbnail from `category` + `name`, so no image",
+    "field is stored here. See EquipmentImages.kt for the keyword mapping."
+  ],
+
+  "box_01": {
+    "name": "Epson LCD Projector",
+    "category": "Audio Visual",
+    "boxNumber": 1,
+    "status": "available",
+    "borrowedBy": "",
+    "borrowedByName": "",
+    "borrowedAt": 0,
+    "dueAt": 0
+  },
+  "box_02": {
+    "name": "Wireless Microphone Set",
+    "category": "Audio Visual",
+    "boxNumber": 2,
+    "status": "available",
+    "borrowedBy": "",
+    "borrowedByName": "",
+    "borrowedAt": 0,
+    "dueAt": 0
+  },
+  "box_03": {
+    "name": "Portable Bluetooth Speaker",
+    "category": "Audio Visual",
+    "boxNumber": 3,
+    "status": "available",
+    "borrowedBy": "",
+    "borrowedByName": "",
+    "borrowedAt": 0,
+    "dueAt": 0
+  },
+  "box_04": {
+    "name": "Dell Laptop",
+    "category": "IT Equipment",
+    "boxNumber": 4,
+    "status": "available",
+    "borrowedBy": "",
+    "borrowedByName": "",
+    "borrowedAt": 0,
+    "dueAt": 0
+  },
+  "box_05": {
+    "name": "HDMI Cable",
+    "category": "Accessories",
+    "boxNumber": 5,
+    "status": "available",
+    "borrowedBy": "",
+    "borrowedByName": "",
+    "borrowedAt": 0,
+    "dueAt": 0
+  },
+  "box_06": {
+    "name": "Extension Cord",
+    "category": "Accessories",
+    "boxNumber": 6,
+    "status": "available",
+    "borrowedBy": "",
+    "borrowedByName": "",
+    "borrowedAt": 0,
+    "dueAt": 0
+  },
+  "box_07": {
+    "name": "DSLR Camera",
+    "category": "Audio Visual",
+    "boxNumber": 7,
+    "status": "available",
+    "borrowedBy": "",
+    "borrowedByName": "",
+    "borrowedAt": 0,
+    "dueAt": 0
+  },
+  "box_08": {
+    "name": "Camera Tripod",
+    "category": "Accessories",
+    "boxNumber": 8,
+    "status": "available",
+    "borrowedBy": "",
+    "borrowedByName": "",
+    "borrowedAt": 0,
+    "dueAt": 0
+  },
+  "box_09": {
+    "name": "Android Tablet",
+    "category": "IT Equipment",
+    "boxNumber": 9,
+    "status": "available",
+    "borrowedBy": "",
+    "borrowedByName": "",
+    "borrowedAt": 0,
+    "dueAt": 0
+  },
+  "box_10": {
+    "name": "Portable Printer",
+    "category": "IT Equipment",
+    "boxNumber": 10,
+    "status": "available",
+    "borrowedBy": "",
+    "borrowedByName": "",
+    "borrowedAt": 0,
+    "dueAt": 0
+  }
+}

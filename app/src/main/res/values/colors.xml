@@ -15,4 +15,9 @@
     <color name="error_red">#E5484D</color>
     <color name="facebook_blue">#1877F2</color>
     <color name="divider">#E6E9E7</color>
+
+    <!-- Status tones used by the borrower dashboard -->
+    <color name="error_red_light">#FCE9EA</color>
+    <color name="warning_amber">#A25E00</color>
+    <color name="warning_amber_light">#FDF0DC</color>
 </resources>

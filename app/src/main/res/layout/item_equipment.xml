@@ -1,0 +1,88 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_marginBottom="10dp"
+    android:background="@drawable/bg_card"
+    android:clickable="true"
+    android:focusable="true"
+    android:foreground="?attr/selectableItemBackground"
+    android:gravity="center_vertical"
+    android:orientation="horizontal"
+    android:padding="16dp">
+
+    <!--
+        Equipment photo. The source and scaleType are set at runtime by
+        EquipmentImages from the item's category/name: a real photo fills the tile,
+        the generic icon fallback is inset instead.
+    -->
+    <com.google.android.material.imageview.ShapeableImageView
+        android:id="@+id/ivEquipmentPhoto"
+        android:layout_width="54dp"
+        android:layout_height="54dp"
+        android:background="@drawable/bg_thumbnail"
+        android:contentDescription="@null"
+        android:scaleType="centerCrop"
+        app:shapeAppearanceOverlay="@style/EquipmentThumbnailShape"
+        tools:src="@drawable/equip_projector" />
+
+    <LinearLayout
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="14dp"
+        android:layout_weight="1"
+        android:orientation="vertical">
+
+        <TextView
+            android:id="@+id/tvEquipmentName"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:ellipsize="end"
+            android:fontFamily="sans-serif-medium"
+            android:maxLines="1"
+            android:textColor="@color/text_primary"
+            android:textSize="15sp"
+            android:textStyle="bold"
+            tools:text="Epson LCD Projector" />
+
+        <TextView
+            android:id="@+id/tvEquipmentMeta"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="2dp"
+            android:ellipsize="end"
+            android:maxLines="1"
+            android:textColor="@color/text_secondary"
+            android:textSize="12sp"
+            tools:text="Box 1  ·  Audio Visual" />
+
+        <TextView
+            android:id="@+id/tvEquipmentDue"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="4dp"
+            android:drawablePadding="6dp"
+            android:drawableStart="@drawable/ic_clock"
+            android:gravity="center_vertical"
+            android:textColor="@color/text_secondary"
+            android:textSize="12sp"
+            android:visibility="gone"
+            tools:text="Sep 10, 3:12 PM  ·  Due in 3h 20m" />
+    </LinearLayout>
+
+    <TextView
+        android:id="@+id/tvEquipmentStatus"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="10dp"
+        android:background="@drawable/bg_pill_available"
+        android:paddingHorizontal="11dp"
+        android:paddingVertical="5dp"
+        android:textColor="@color/brand_dark_green"
+        android:textSize="11sp"
+        android:textStyle="bold"
+        tools:text="Available" />
+
+</LinearLayout>

@@ -1,0 +1,159 @@
+<?xml version="1.0" encoding="utf-8"?><!--
+    Read-only detail for one SmartDock box. Covers FR-05 (item name, borrow time,
+    return time, box location) and stays a monitoring view: there is no borrow
+    button, because FR-01/FR-03 put the checkout at the tower behind an RFID tap.
+-->
+<androidx.core.widget.NestedScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/white"
+    android:fillViewport="true"
+    tools:context=".EquipmentDetailActivity">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:paddingHorizontal="28dp"
+        android:paddingTop="24dp"
+        android:paddingBottom="32dp">
+
+        <ImageView
+            android:id="@+id/ivBack"
+            android:layout_width="36dp"
+            android:layout_height="36dp"
+            android:background="?attr/selectableItemBackgroundBorderless"
+            android:contentDescription="@null"
+            android:padding="6dp"
+            android:src="@drawable/ic_back" />
+
+        <com.google.android.material.imageview.ShapeableImageView
+            android:id="@+id/ivPhoto"
+            android:layout_width="match_parent"
+            android:layout_height="200dp"
+            android:layout_marginTop="12dp"
+            android:background="@drawable/bg_thumbnail"
+            android:contentDescription="@null"
+            android:scaleType="centerCrop"
+            app:shapeAppearanceOverlay="@style/DetailPhotoShape"
+            tools:src="@drawable/equip_projector" />
+
+        <TextView
+            android:id="@+id/tvName"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="18dp"
+            android:fontFamily="sans-serif-medium"
+            android:textColor="@color/text_primary"
+            android:textSize="24sp"
+            android:textStyle="bold"
+            tools:text="Epson LCD Projector" />
+
+        <TextView
+            android:id="@+id/tvStatusPill"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="10dp"
+            android:background="@drawable/bg_pill_available"
+            android:paddingHorizontal="12dp"
+            android:paddingVertical="6dp"
+            android:textColor="@color/brand_dark_green"
+            android:textSize="12sp"
+            android:textStyle="bold"
+            tools:text="Available" />
+
+        <!-- What the borrower has to do at the tower, per the current status -->
+        <TextView
+            android:id="@+id/tvHint"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="20dp"
+            android:background="@drawable/bg_card_muted"
+            android:drawablePadding="12dp"
+            android:drawableStart="@drawable/ic_box"
+            android:gravity="center_vertical"
+            android:lineSpacingExtra="3dp"
+            android:padding="16dp"
+            android:textColor="@color/text_secondary"
+            android:textSize="13sp"
+            tools:text="Tap your RFID card on the SmartDock tower, then take it from Box 1." />
+
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:layout_marginTop="22dp"
+            android:background="@color/divider" />
+
+        <LinearLayout
+            android:id="@+id/rowCategory"
+            style="@style/DetailRow">
+
+            <TextView
+                style="@style/DetailRowLabel"
+                android:text="@string/detail_category" />
+
+            <TextView
+                android:id="@+id/tvCategory"
+                style="@style/DetailRowValue"
+                tools:text="Audio Visual" />
+        </LinearLayout>
+
+        <LinearLayout style="@style/DetailRow">
+
+            <TextView
+                style="@style/DetailRowLabel"
+                android:text="@string/detail_box" />
+
+            <TextView
+                android:id="@+id/tvBox"
+                style="@style/DetailRowValue"
+                tools:text="Box 1" />
+        </LinearLayout>
+
+        <LinearLayout
+            android:id="@+id/rowHolder"
+            style="@style/DetailRow"
+            tools:visibility="visible">
+
+            <TextView
+                style="@style/DetailRowLabel"
+                android:text="@string/detail_holder" />
+
+            <TextView
+                android:id="@+id/tvHolder"
+                style="@style/DetailRowValue"
+                tools:text="You" />
+        </LinearLayout>
+
+        <LinearLayout
+            android:id="@+id/rowBorrowedAt"
+            style="@style/DetailRow">
+
+            <TextView
+                style="@style/DetailRowLabel"
+                android:text="@string/detail_borrowed_at" />
+
+            <TextView
+                android:id="@+id/tvBorrowedAt"
+                style="@style/DetailRowValue"
+                tools:text="Sep 10, 9:12 AM" />
+        </LinearLayout>
+
+        <LinearLayout
+            android:id="@+id/rowDueAt"
+            style="@style/DetailRow">
+
+            <TextView
+                style="@style/DetailRowLabel"
+                android:text="@string/detail_due_at" />
+
+            <TextView
+                android:id="@+id/tvDueAt"
+                style="@style/DetailRowValue"
+                tools:text="Sep 10, 3:12 PM" />
+        </LinearLayout>
+
+    </LinearLayout>
+</androidx.core.widget.NestedScrollView>
