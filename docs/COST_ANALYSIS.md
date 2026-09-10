@@ -9,10 +9,16 @@ boxes built as **separate modules that stack**.
 if the budget ever allows; §7.2 replaces it with bought stackable bins.
 The team already owns one ESP32, so that line is ₱0 throughout.
 
-> **Prices are estimates, not quotations.** They reflect typical Philippine
-> hobby-electronics retail (Shopee / Lazada / Makerlab / e-Gizmo) in PHP and
-> must be confirmed against live listings before this table goes in the paper.
-> Every row is marked ☐ until someone has checked it against a real cart.
+> **Prices are estimates, not quotations**, except where marked ✔. They reflect
+> typical Philippine hobby-electronics retail (Shopee / Lazada / Makerlab /
+> e-Gizmo) in PHP. Every row is marked ☐ until checked against a real cart.
+>
+> **Known calibration gap.** The one price verified against an actual purchase —
+> the team's ESP32 at **₱372** — came in **49% above** the ₱250 estimated here.
+> One data point is not a trend, but it points the same way: these figures were
+> taken at the low end of each listing range, and a real cart will land higher.
+> The contingency is set at **20%, not 10%**, to absorb that. See §7.4 for what
+> gives if prices run higher still.
 
 ---
 
@@ -43,7 +49,7 @@ Search terms are what actually returns the right part on Shopee/Lazada PH.
 
 | ☐ | Part | Exact spec to buy | Search term | Qty | Unit ₱ | ₱ |
 |---|---|---|---|---|---|---|
-| ✔ | Microcontroller | ESP32 DevKit V1 — **the team already owns one** | *(owned)* | 1 | 0 | **0** |
+| ✔ | Microcontroller | ESP32 DevKit V1 — **the team already owns one**, bought at **₱372** | *(owned)* | 1 | 0 | **0** |
 | ☐ | RFID reader | MFRC522 kit — module + 1 white card + 1 keyfob | `RC522 RFID module kit` | 1 | 120 | 120 |
 | ☐ | GPIO expander | MCP23017 **breakout module** (not the bare DIP), I2C, addr 0x20 | `MCP23017 I2C module` | 1 | 140 | 140 |
 | ☐ | Buzzer | **Active** 5V buzzer module, 3-pin (KY-012). Not passive | `active buzzer module 5V` | 1 | 35 | 35 |
@@ -61,6 +67,11 @@ are labelled on yours before building around it.
 
 **The USB cable must carry data.** A charge-only cable powers the board but
 never uploads, which looks exactly like a dead board.
+
+**₱372 is the verified board price**, not the ₱250 first estimated. It does not
+change the totals — the board is already bought — but it is the number to use
+for a spare (§9) or a second station (§10), and it is the reason the contingency
+in this document is 20%.
 
 The MCP23017 exposes 16 pins, so it carries the 4 demo boxes and scales to 16
 with no second expander. That is what makes per-box sensing affordable — the
@@ -347,24 +358,53 @@ to do.
 
 ---
 
+### 7.4 If prices come in higher than estimated
+
+The ESP32 ran 49% over estimate. If the rest of the BOM does the same, the
+budget build lands at roughly **₱805 per member**, not ₱541 — over the ceiling.
+Two things to do about that:
+
+**Verify these four lines first.** They are ₱960 of the ₱1,965 subtotal, so
+pinning them down settles half the budget in four searches:
+
+| ☐ | Line | Estimated ₱ | Actual ₱ |
+|---|---|---|---|
+| ☐ | Storage bins ×4 | 480 | |
+| ☐ | FC-51 sensors ×4 | 220 | |
+| ☐ | MCP23017 module | 140 | |
+| ☐ | MFRC522 kit | 120 | |
+
+**Then cut in this order if you still need room.** Cheapest damage first:
+
+| Cut | Saves ₱ | Cost to the project |
+|---|---|---|
+| Borrow a breadboard and jumper sets | 230 | None, if someone in the class has them |
+| 3-pack of borrower cards, not 5 | 40 | Fewer spare cards on demo day |
+| Demo 3 boxes instead of 4 | 215 | Still enough for the checklist's demo script — it only exercises boxes 1 and 2 |
+| Drop the per-equipment RFID tags | 80 | Contradicts the paper's §3.1 and loses per-item identity |
+| Skip the controller housing, mount the board behind the stack | 100 | Looks unfinished; reader ends up at an awkward height |
+
+Do **not** cut the FC-51 sensors, the RC522 or the MCP23017 to save money.
+Those three are the system; everything else is packaging.
+
 ## 8. Totals
 
-| Build | Core | Boxes | Cards | Enclosure | Misc | **Subtotal** | +10% | **Total ₱** | **Per member** |
+Contingency raised to 20% — see the calibration note at the top.
+
+| Build | Core | Boxes | Cards | Enclosure | Misc | **Subtotal** | +20% | **Total ₱** | **Per member** |
 |---|---|---|---|---|---|---|---|---|---|
-| **Budget (bins)** | 665 | 380 | 100 | 640 | 180 | 1,965 | 197 | **2,162** | **541** |
-| Standard (12mm MDF) | 845 | 450 | 180 | 1,710 | 350 | 3,535 | 354 | **3,889** | 972 |
-| Premium (acrylic) | 845 | 450 | 180 | 3,000 | 350 | 4,825 | 483 | **5,308** | 1,327 |
+| **Budget (bins)** | 665 | 380 | 100 | 640 | 180 | 1,965 | 393 | **2,358** | **590** |
+| Standard (12mm MDF) | 845 | 450 | 180 | 1,710 | 350 | 3,535 | 707 | **4,242** | 1,061 |
+| Premium (acrylic) | 845 | 450 | 180 | 3,000 | 350 | 4,825 | 965 | **5,790** | 1,448 |
 
-**The budget build comes to ₱541 each — under the ₱600 target, with ₱59 of
-headroom per member.**
+**The budget build is ₱590 per member — still under ₱600, but the headroom is
+now ₱10 instead of ₱59.** The doubled contingency ate it. That is the honest
+position: the target is met on paper, and a single line running 50% over will
+break it.
 
-Two thirds of the saving is one decision: bought bins instead of a built
-enclosure, ₱1,070. The owned ESP32 is another ₱250. Nothing else on the list
-moves the number much, which is worth knowing — do not shave the sensors or the
-reader chasing the last hundred pesos, because those are what make it work.
-
-The 10% contingency stays in. Expect at least one dead sensor module, and at
-this budget there is no spare anything.
+This is why §7.4 lists the four prices to verify. Four searches convert most of
+this table from estimate to fact, and until they happen, ₱590 is a projection
+rather than a number to quote in the paper.
 
 ## 9. Procurement notes
 
@@ -376,9 +416,11 @@ this budget there is no spare anything.
 - **AliExpress is roughly 40–50% cheaper** on every electronic line item, but
   ships in 2–4 weeks. Viable only if ordered well ahead of the deadline; local
   sellers are the safe choice this close to submission.
-- **Buy one spare ESP32** (+₱250) if the budget allows. A board killed by a
-  wiring mistake the night before the demo is the single worst failure mode
-  here, and it is the one component nothing else can substitute for.
+- **A spare ESP32 costs ₱372** — the verified price. At this budget it is
+  almost certainly out of reach, so treat the board you own as irreplaceable:
+  double-check the 3.3V rail before powering anything, and never rewire it
+  live. A board killed the night before the demo is the one failure nothing
+  else in this BOM can substitute for.
 
 ## 10. Cost per additional unit (for the paper's scalability section)
 
@@ -389,7 +431,7 @@ If SmartDock were deployed beyond the prototype:
 | One more box (bin/shell, sensor, tag, wiring) | 215 | 330 |
 | Boxes 5 and 6 — completing the checklist's six | 430 | 660 |
 | Filling the MCP23017 to 16 boxes (12 more) | 2,580 | 3,960 |
-| A second full station (ESP32, reader, expander, head) | ~800 + boxes | ~1,400 + boxes |
+| A second full station (ESP32, reader, expander, head) | ~920 + boxes | ~1,520 + boxes |
 | One more registered borrower | 20 | 18 |
 
 Each new box brings its own shell rather than sharing walls with its neighbours
