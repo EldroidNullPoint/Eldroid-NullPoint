@@ -4,6 +4,11 @@ Costing for the SmartDock prototype described in `ELDROID_NULL POINT_Paper.docx`
 sized for a **4-box demo** with an RFID tag on every piece of equipment and
 boxes built as **separate modules that stack**.
 
+**Budget constraint: ~₱600 per member.** §7 is the build that meets it, at
+**₱541 each**, and it is the recommended one. §4's MDF enclosure is the upgrade
+if the budget ever allows; §7.2 replaces it with bought stackable bins.
+The team already owns one ESP32, so that line is ₱0 throughout.
+
 > **Prices are estimates, not quotations.** They reflect typical Philippine
 > hobby-electronics retail (Shopee / Lazada / Makerlab / e-Gizmo) in PHP and
 > must be confirmed against live listings before this table goes in the paper.
@@ -38,7 +43,7 @@ Search terms are what actually returns the right part on Shopee/Lazada PH.
 
 | ☐ | Part | Exact spec to buy | Search term | Qty | Unit ₱ | ₱ |
 |---|---|---|---|---|---|---|
-| ☐ | Microcontroller | ESP32 DevKit V1, ESP-WROOM-32, **38-pin**, CP2102 or CH340 USB | `ESP32 DevKit V1 38 pin` | 1 | 250 | 250 |
+| ✔ | Microcontroller | ESP32 DevKit V1 — **the team already owns one** | *(owned)* | 1 | 0 | **0** |
 | ☐ | RFID reader | MFRC522 kit — module + 1 white card + 1 keyfob | `RC522 RFID module kit` | 1 | 120 | 120 |
 | ☐ | GPIO expander | MCP23017 **breakout module** (not the bare DIP), I2C, addr 0x20 | `MCP23017 I2C module` | 1 | 140 | 140 |
 | ☐ | Buzzer | **Active** 5V buzzer module, 3-pin (KY-012). Not passive | `active buzzer module 5V` | 1 | 35 | 35 |
@@ -47,12 +52,15 @@ Search terms are what actually returns the right part on Shopee/Lazada PH.
 | ☐ | Breadboard | 830 tie-point MB-102 | `breadboard 830` | 1 | 110 | 110 |
 | ☐ | Jumpers | 40-pc ribbon: M-M, M-F, F-F, 20cm — one set each | `dupont jumper wire 40pcs` | 3 | 60 | 180 |
 | ☐ | Power | 5V 2A adapter + Micro-USB **data** cable (not charge-only) | `5V 2A adapter micro usb` | 1 | 200 | 200 |
-| | **Subtotal** | | | | | **1,095** |
+| | **Subtotal** | | | | | **845** |
 
-**Two traps to avoid.** Get the **38-pin** ESP32, not the 30-pin — the 30-pin
-board omits pins the checklist's pinout uses. And the USB cable must carry
-data; a charge-only cable powers the board but never uploads, which looks
-exactly like a dead board.
+**Check the board you already have.** The checklist's pinout uses GPIO 5, 18,
+19, 22, 23, 25, 26 and 27. Both the 38-pin and 30-pin ESP32 variants break all
+eight out, so an existing board is almost certainly fine — confirm those pins
+are labelled on yours before building around it.
+
+**The USB cable must carry data.** A charge-only cable powers the board but
+never uploads, which looks exactly like a dead board.
 
 The MCP23017 exposes 16 pins, so it carries the 4 demo boxes and scales to 16
 with no second expander. That is what makes per-box sensing affordable — the
@@ -80,9 +88,10 @@ cannot. Ten pesos a box buys that.
 swings to whatever it is powered from, and the MCP23017 in this build runs at
 3.3V. Feeding it 5V puts 5V on an expander input.
 
-**Marginal cost per additional box: ₱330** — ₱105 of electronics above plus
-~₱225 for the module's own shell (§4). The checklist lists six boxes
-(`box-01`…`box-06`); completing all six adds **₱660**.
+**Marginal cost per additional box:** ₱330 on the MDF build (₱105 electronics
++ ~₱225 for the module's own shell, §4), or **₱215 on the budget build** (₱95
+electronics + ₱120 for one more bin). The checklist lists six boxes
+(`box-01`…`box-06`); completing all six adds **₱430** at budget prices.
 
 ## 3. Borrower cards
 
@@ -270,29 +279,94 @@ system is ₱0, and the whole figure below is one-time capital.
 
 ---
 
-## 7. Totals
+## 7. Budget build – target ₱600 per member
 
-| Build | Core | Boxes | Cards | Enclosure | Misc | **Subtotal** | +10% | **Total ₱** | Per member |
+The MDF build lands at ₱972 each. This version reaches **₱541** without giving
+up stacking, four boxes, or an RFID tag per item. Every substitution and what
+it costs you:
+
+### 7.1 Where the money comes off
+
+| Line | Standard | Budget | Saved | What you give up |
+|---|---|---|---|---|
+| ESP32 | 250 | **0** | 250 | Nothing — already owned |
+| Enclosure | 1,710 | **640** | 1,070 | Bought bins instead of a built carcass |
+| Power supply | 200 | **80** | 120 | Reuse a phone charger; buy the data cable only |
+| Jumper sets | 180 | **120** | 60 | 2 sets, not 3 — buy M-F and M-M |
+| Box connectors | 50 | **0** | 50 | Dupont from the jumper sets instead of JST |
+| Box wiring | 100 | **80** | 20 | One 10 m roll beats four 1 m cuts |
+| Borrower cards | 180 | **100** | 80 | 5-pack, not 10 |
+| Consumables | 350 | **180** | 170 | No perfboard, no wood glue/screws/sanding |
+| | | | **1,820** | |
+
+### 7.2 The enclosure: bought bins, not built boxes
+
+**Open-front stackable storage bins**, four of them, plus one for the
+controller head.
+
+| ☐ | Item | Spec | ₱ |
+|---|---|---|---|
+| ☐ | Storage bin ×4 | **Open-front** stackable parts/shoe bin, ≥300 × 200 × 150mm interior | 480 |
+| ☐ | Controller housing | One more bin, or a plastic project box | 100 |
+| ☐ | Mounting | Adhesive pads / velcro for sensors and boards | 60 |
+| | **Subtotal** | | **640** |
+
+**The bins must open at the front, not the top.** This is the one requirement
+that cannot bend: a top-opening crate is unreachable the moment another box
+stacks on it, which defeats the entire arrangement. Search `stackable parts
+bin` or `shoe box organizer drop front` — not `storage crate`.
+
+This substitution is not purely a compromise. Bins are **designed** to stack and
+interlock, so they solve registration, load and squareness for free — the
+corner blocks, dowels, glued shear panel and panel-saw cuts all exist only
+because MDF does not stack on its own. You also skip the entire build: no
+cutting, no gluing, no waiting on a hardware store.
+
+What you actually lose is the custom-fabricated look, which may matter at a
+defense, and the fixed 300 × 200 × 150mm interior instead of a size you chose.
+Confirm the 230mm microphone fits before buying four.
+
+**Drilling the sensor hole:** plastic cracks under a spade bit. Melt a clean
+10mm hole with a soldering iron, or drill slowly with a step bit.
+
+### 7.3 Two cuts that carry real risk
+
+Both are worth taking at this budget, but know what you are accepting:
+
+- **No perfboard — the circuit stays on the breadboard.** Loose breadboard
+  contacts are the most common cause of a demo failing on stage. Mitigate:
+  zip-tie the harness, mount the breadboard down with adhesive pads, and do not
+  move the wiring once it works. Add the ₱100 perfboard later if you can.
+- **Dupont instead of JST connectors.** Dupont pulls apart more easily. Put a
+  zip-tie strain relief behind each box's connector so the pull lands on the
+  tie, not the pins.
+
+Everything else on that list is free money: the ESP32 you own, a charger you
+own, a smaller card pack, and bins that do a job MDF needed ₱1,070 of material
+to do.
+
+---
+
+## 8. Totals
+
+| Build | Core | Boxes | Cards | Enclosure | Misc | **Subtotal** | +10% | **Total ₱** | **Per member** |
 |---|---|---|---|---|---|---|---|---|---|
-| **Standard (12mm MDF)** | 1,095 | 450 | 180 | 1,710 | 350 | 3,785 | 379 | **4,164** | **1,041** |
-| Premium (5mm acrylic) | 1,095 | 450 | 180 | 3,000 | 350 | 5,075 | 508 | **5,583** | 1,396 |
+| **Budget (bins)** | 665 | 380 | 100 | 640 | 180 | 1,965 | 197 | **2,162** | **541** |
+| Standard (12mm MDF) | 845 | 450 | 180 | 1,710 | 350 | 3,535 | 354 | **3,889** | 972 |
+| Premium (acrylic) | 845 | 450 | 180 | 3,000 | 350 | 4,825 | 483 | **5,308** | 1,327 |
 
-**Recommended: the 12mm MDF build at ≈₱4,200**, or **₱1,041 per member**.
+**The budget build comes to ₱541 each — under the ₱600 target, with ₱59 of
+headroom per member.**
 
-**Stacking is what this costs.** A single fixed 2×2 carcass in 9mm MDF came to
-₱2,998. Requiring the boxes to stack raises it to ₱4,164 — **+₱1,166, or 39%** —
-and all of it lands in the enclosure: thicker material, five separate module
-shells instead of one carcass, corner blocks, dowels and connectors. The
-electronics do not change at all.
+Two thirds of the saving is one decision: bought bins instead of a built
+enclosure, ₱1,070. The owned ESP32 is another ₱250. Nothing else on the list
+moves the number much, which is worth knowing — do not shave the sensors or the
+reader chasing the last hundred pesos, because those are what make it work.
 
-What the money buys is modularity. Boxes come apart for transport, a failed
-module swaps out without touching the others, and boxes 5 and 6 bolt on later
-without rebuilding anything.
+The 10% contingency stays in. Expect at least one dead sensor module, and at
+this budget there is no spare anything.
 
-The 10% contingency is not padding — expect at least one dead sensor module and
-one mis-cut panel on a first build.
-
-## 8. Procurement notes
+## 9. Procurement notes
 
 - **Buy the beam sensors as a 5-pack, not 4 singles.** They are the most
   failure-prone part in the BOM and the per-unit price drops in a pack.
@@ -306,23 +380,23 @@ one mis-cut panel on a first build.
   wiring mistake the night before the demo is the single worst failure mode
   here, and it is the one component nothing else can substitute for.
 
-## 9. Cost per additional unit (for the paper's scalability section)
+## 10. Cost per additional unit (for the paper's scalability section)
 
 If SmartDock were deployed beyond the prototype:
 
-| Scenario | Added cost ₱ |
-|---|---|
-| One more box module (shell, sensor, tag, wiring, connector) | 330 |
-| Boxes 5 and 6 — completing the checklist's six | 660 |
-| Filling the MCP23017 to 16 boxes (12 more) | 3,960 |
-| A second full station (head, ESP32, reader, expander) | ~1,400 + boxes |
-| One more registered borrower | 18 (one card) |
+| Scenario | Budget build ₱ | MDF build ₱ |
+|---|---|---|
+| One more box (bin/shell, sensor, tag, wiring) | 215 | 330 |
+| Boxes 5 and 6 — completing the checklist's six | 430 | 660 |
+| Filling the MCP23017 to 16 boxes (12 more) | 2,580 | 3,960 |
+| A second full station (ESP32, reader, expander, head) | ~800 + boxes | ~1,400 + boxes |
+| One more registered borrower | 20 | 18 |
 
-A stacking module costs **₱330**, against ₱100 for a compartment in a fixed
-carcass — each new box now brings its own shell (~₱225 of material) rather than
-sharing four walls with its neighbours. That is the standing price of
-modularity, and it is worth stating in the paper: the system scales one box at
-a time with no rebuild, at a known and constant unit cost.
+Each new box brings its own shell rather than sharing walls with its neighbours
+— **₱215 at budget prices**. That is the standing price of modularity, and it
+is the good version of this number for the paper: the system scales one box at
+a time, with no rebuild and no rewiring of what is already there, at a known
+and constant unit cost.
 
-Per-borrower cost is the headline number for a school pitch: **₱18 per student**
+Per-borrower cost is the headline number for a school pitch: **₱20 per student**
 once a station exists, with no recurring cloud fee.
