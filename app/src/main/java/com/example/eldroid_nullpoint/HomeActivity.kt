@@ -43,7 +43,7 @@ class HomeActivity : AppCompatActivity(), HomeContract.View {
     
     private val debugListener: (String) -> Unit = { message ->
         runOnUiThread {
-            binding.tvDebugBanner.text = "🔍 $message"
+            binding.tvDebugBanner.text = message
         }
     }
 
@@ -75,6 +75,7 @@ class HomeActivity : AppCompatActivity(), HomeContract.View {
     override fun onStart() {
         super.onStart()
         com.example.eldroid_nullpoint.util.DebugBroadcaster.addListener(debugListener)
+        com.example.eldroid_nullpoint.util.DebugBroadcaster.broadcast("🏠 HomeActivity onStart()")
         if (currentUid.isNotBlank()) presenter.onStart(currentUid)
     }
 
@@ -154,6 +155,11 @@ class HomeActivity : AppCompatActivity(), HomeContract.View {
     }
 
     private fun setupFirebaseConnectionMonitor() {
+        // Add a test button to verify broadcast system works
+        binding.tvTestBanner.setOnClickListener {
+            com.example.eldroid_nullpoint.util.DebugBroadcaster.broadcast("🧪 TEST: Banner clicked at ${System.currentTimeMillis()}")
+        }
+        
         // Test Firestore connectivity
         com.google.firebase.firestore.FirebaseFirestore.getInstance()
             .collection("equipment")
