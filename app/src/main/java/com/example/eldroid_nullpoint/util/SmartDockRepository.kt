@@ -42,6 +42,11 @@ object SmartDockRepository {
     fun borrow(equipmentId: String, uid: String, userName: String): Task<BorrowReceipt> {
         val db = firestore
         val equipmentRef = db.collection(Equipment.COLLECTION).document(equipmentId)
+
+        // Step 1: atomic transaction — mark equipment borrowed + append transaction log.
+        // Notification is written AFTER commit (same pattern as returnItem) to avoid
+        // PERMISSION_DENIED when a prior borrow notification for this uid+equipment
+        // already exists in Firestore (rules only allow create for new docs).
         return db.runTransaction { tx ->
             val snapshot = tx.get(equipmentRef)
             val current = if (snapshot.exists()) Equipment.from(snapshot) else null
@@ -56,14 +61,31 @@ object SmartDockRepository {
                 db.collection(Transaction.COLLECTION).document(),
                 LoanPolicy.transactionDoc(current, uid, userName, Transaction.TYPE_BORROW, now)
             )
+            // Pass equipment + timestamps out for the post-commit notification write.
+            android.util.Pair(current, now)
+        }.continueWithTask { txTask ->
+            if (!txTask.isSuccessful) {
+                throw txTask.exception ?: Exception("Borrow transaction failed")
+            }
+            val pair = txTask.result!!
+            val equipment: Equipment = pair.first
+            val now: Long = pair.second
+            val dueAt: Long = LoanPolicy.dueAtFor(now)
+
+            // Step 2: write borrow confirmation notification outside the transaction.
             val notification = LoanPolicy.eventNotification(
-                current, uid, AppNotification.TYPE_BORROW, borrowedAt = now, now = now
+                equipment, uid, AppNotification.TYPE_BORROW,
+                borrowedAt = now, now = now
             )
-            tx.set(
-                db.collection(AppNotification.COLLECTION).document(notification.id),
-                notification.toMap()
-            )
-            BorrowReceipt(current, now, LoanPolicy.dueAtFor(now))
+            val notifRef = db.collection(AppNotification.COLLECTION).document(notification.id)
+            notifRef.get().continueWithTask { getTask ->
+                if (getTask.isSuccessful && getTask.result?.exists() == false) {
+                    notifRef.set(notification.toMap())
+                        .continueWith { BorrowReceipt(equipment, now, dueAt) }
+                } else {
+                    Tasks.forResult(BorrowReceipt(equipment, now, dueAt))
+                }
+            }
         }
     }
 
