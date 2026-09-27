@@ -54,11 +54,12 @@ class EquipmentAdapter(
 
             binding.tvEquipmentName.text = equipment.name.ifBlank { "Unnamed equipment" }
 
-            // Photo resolved from the category/name, falling back to a generic icon.
+            // Photo: use admin-uploaded image if present, otherwise resolve from category/name.
             EquipmentImages.bindInto(
                 binding.ivEquipmentPhoto,
                 equipment.name,
-                equipment.category
+                equipment.category,
+                equipment.imageData
             )
 
             val boxLabel = context.getString(R.string.box_label, equipment.boxNumber)

@@ -21,7 +21,12 @@ data class Equipment(
     /** Unix epoch millis, or 0 when not borrowed. */
     val borrowedAt: Long = 0L,
     /** Unix epoch millis, or 0 when not borrowed. */
-    val dueAt: Long = 0L
+    val dueAt: Long = 0L,
+    /**
+     * Optional data-URL image uploaded via the admin dashboard, e.g.
+     * "data:image/webp;base64,AAAA...". Empty string means no admin photo.
+     */
+    val imageData: String = ""
 ) {
     val isBorrowed: Boolean get() = status == STATUS_BORROWED
 
@@ -49,7 +54,8 @@ data class Equipment(
             borrowedBy = doc.getString("borrowedBy").orEmpty(),
             borrowedByName = doc.getString("borrowedByName").orEmpty(),
             borrowedAt = (doc.get("borrowedAt") as? Number)?.toLong() ?: 0L,
-            dueAt = (doc.get("dueAt") as? Number)?.toLong() ?: 0L
+            dueAt = (doc.get("dueAt") as? Number)?.toLong() ?: 0L,
+            imageData = doc.getString("imageData").orEmpty()
         )
     }
 }

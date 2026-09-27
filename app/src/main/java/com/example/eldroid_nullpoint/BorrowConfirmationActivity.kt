@@ -23,6 +23,7 @@ class BorrowConfirmationActivity : AppCompatActivity() {
         private const val EXTRA_BOX = "extra_box"
         private const val EXTRA_BORROWED_AT = "extra_borrowed_at"
         private const val EXTRA_DUE_AT = "extra_due_at"
+        private const val EXTRA_IMAGE_DATA = "extra_image_data"
 
         fun intent(context: Context, receipt: SmartDockRepository.BorrowReceipt): Intent =
             Intent(context, BorrowConfirmationActivity::class.java)
@@ -32,6 +33,7 @@ class BorrowConfirmationActivity : AppCompatActivity() {
                 .putExtra(EXTRA_BOX, receipt.equipment.boxNumber)
                 .putExtra(EXTRA_BORROWED_AT, receipt.borrowedAt)
                 .putExtra(EXTRA_DUE_AT, receipt.dueAt)
+                .putExtra(EXTRA_IMAGE_DATA, receipt.equipment.imageData)
     }
 
     private lateinit var binding: ActivityBorrowConfirmationBinding
@@ -47,8 +49,9 @@ class BorrowConfirmationActivity : AppCompatActivity() {
         val boxNumber = intent.getIntExtra(EXTRA_BOX, 0)
         val borrowedAt = intent.getLongExtra(EXTRA_BORROWED_AT, 0L)
         val dueAt = intent.getLongExtra(EXTRA_DUE_AT, 0L)
+        val imageData = intent.getStringExtra(EXTRA_IMAGE_DATA).orEmpty()
 
-        EquipmentImages.bindInto(binding.ivPhoto, name, category, fallbackPaddingDp = 40)
+        EquipmentImages.bindInto(binding.ivPhoto, name, category, imageData, fallbackPaddingDp = 40)
         binding.tvItemName.text = name.ifBlank { getString(R.string.label_item) }
         binding.tvBox.text = getString(R.string.box_label, boxNumber)
         binding.tvBorrowedAt.text = TimeFormat.dateTime(borrowedAt)

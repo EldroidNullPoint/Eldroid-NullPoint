@@ -124,7 +124,7 @@ class EquipmentDetailActivity : AppCompatActivity(), EquipmentDetailContract.Vie
         val isOverdue = equipment.isOverdue()
 
         binding.tvName.text = equipment.name.ifBlank { getString(R.string.title_equipment_detail) }
-        EquipmentImages.bindInto(binding.ivPhoto, equipment.name, equipment.category, fallbackPaddingDp = 60)
+        EquipmentImages.bindInto(binding.ivPhoto, equipment.name, equipment.category, equipment.imageData, fallbackPaddingDp = 60)
 
         val (statusLabel, pillBackground, pillTextColor) = when {
             isMine && isOverdue -> Triple(

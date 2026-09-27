@@ -58,6 +58,9 @@ dependencies {
     // Background due-date checks for FR-06 reminders
     implementation(libs.androidx.work.runtime.ktx)
 
+    // Image loading — decodes Base64 data-URLs from the admin dashboard
+    implementation(libs.glide)
+
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)

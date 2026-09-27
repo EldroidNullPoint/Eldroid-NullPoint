@@ -246,7 +246,7 @@ class HomeActivity : AppCompatActivity(), HomeContract.View {
         }
 
         binding.tvCurrentName.text = item.name.ifBlank { "Unnamed equipment" }
-        EquipmentImages.bindInto(binding.ivCurrentPhoto, item.name, item.category, fallbackPaddingDp = 15)
+        EquipmentImages.bindInto(binding.ivCurrentPhoto, item.name, item.category, item.imageData, fallbackPaddingDp = 15)
 
         val boxLabel = getString(R.string.box_label, item.boxNumber)
         binding.tvCurrentBox.text = if (item.category.isBlank()) boxLabel
