@@ -11,8 +11,13 @@ import com.example.eldroid_nullpoint.model.Transaction
  */
 object LoanPolicy {
 
-    /** Every loan is due 24 hours after it starts. */
-    const val LOAN_DURATION_MS = 24 * 60 * 60 * 1000L
+    /**
+     * Default loan duration: 3 hours (spec §7).
+     * The authoritative value is admin-configurable on the backend;
+     * this constant is used only for the in-app borrow action while
+     * the full policy system is being built.
+     */
+    const val LOAN_DURATION_MS = 3 * 60 * 60 * 1000L
 
     fun dueAtFor(borrowedAt: Long): Long = borrowedAt + LOAN_DURATION_MS
 
@@ -60,15 +65,21 @@ object LoanPolicy {
         userName: String,
         type: String,
         now: Long
-    ): Map<String, Any> = mapOf(
-        "uid" to uid,
-        "userName" to userName,
-        "equipmentId" to equipment.id,
-        "equipmentName" to equipment.name,
-        "boxNumber" to equipment.boxNumber,
-        "type" to type,
-        "timestamp" to now
-    )
+    ): Map<String, Any> {
+        val due = if (type == Transaction.TYPE_BORROW) dueAtFor(now) else 0L
+        return mapOf(
+            "uid"            to uid,
+            "userName"       to userName,
+            "equipmentId"    to equipment.id,
+            "equipmentName"  to equipment.name,
+            "boxNumber"      to equipment.boxNumber,
+            "type"           to type,
+            "timestamp"      to now,
+            "originalDueAt"  to due,
+            "currentDueAt"   to due,
+            "extensionCount" to 0
+        )
+    }
 
     /** Inbox entry confirming a borrow (FR-05) or a return. */
     fun eventNotification(

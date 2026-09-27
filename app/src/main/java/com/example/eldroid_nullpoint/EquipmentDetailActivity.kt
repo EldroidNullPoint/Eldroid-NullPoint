@@ -58,6 +58,7 @@ class EquipmentDetailActivity : AppCompatActivity(), EquipmentDetailContract.Vie
         binding.ivBack.setOnClickListener { finish() }
         binding.btnBorrow.setOnClickListener { confirmBorrow() }
         binding.btnReturn.setOnClickListener { confirmReturn() }
+        binding.btnRequestExtension.setOnClickListener { presenter.onExtensionClicked() }
     }
 
     override fun onStart() {
@@ -207,6 +208,10 @@ class EquipmentDetailActivity : AppCompatActivity(), EquipmentDetailContract.Vie
         binding.btnReturn.visibility = if (visible) View.VISIBLE else View.GONE
     }
 
+    override fun showExtensionButton(visible: Boolean) {
+        binding.btnRequestExtension.visibility = if (visible) View.VISIBLE else View.GONE
+    }
+
     override fun showActionArea(visible: Boolean) {
         binding.actionArea.visibility = if (visible) View.VISIBLE else View.GONE
     }
@@ -233,6 +238,19 @@ class EquipmentDetailActivity : AppCompatActivity(), EquipmentDetailContract.Vie
 
     override fun navigateToBorrowConfirmation(receipt: SmartDockRepository.BorrowReceipt) {
         startActivity(BorrowConfirmationActivity.intent(this, receipt))
+    }
+
+    override fun navigateToExtensionRequest(
+        equipmentId: String,
+        equipmentName: String,
+        transactionId: String,
+        currentDueAt: Long
+    ) {
+        startActivity(
+            ExtensionRequestActivity.intent(
+                this, equipmentId, equipmentName, transactionId, currentDueAt
+            )
+        )
     }
 
     override fun close() {

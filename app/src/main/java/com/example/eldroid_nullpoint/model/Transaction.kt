@@ -17,7 +17,13 @@ data class Transaction(
     /** "borrow", "return", "overdue" or "alert". */
     val type: String = "",
     /** Unix epoch millis. */
-    val timestamp: Long = 0L
+    val timestamp: Long = 0L,
+    /** Original due time when the loan was created. Unix epoch millis, 0 for return records. */
+    val originalDueAt: Long = 0L,
+    /** Current due time, updated if an extension was approved. Unix epoch millis. */
+    val currentDueAt: Long = 0L,
+    /** Number of approved extensions on this loan. */
+    val extensionCount: Int = 0
 ) {
     companion object {
         const val COLLECTION = "transactions"
@@ -27,14 +33,17 @@ data class Transaction(
         const val TYPE_ALERT = "alert"
 
         fun from(doc: DocumentSnapshot): Transaction = Transaction(
-            id = doc.id,
-            uid = doc.getString("uid").orEmpty(),
-            userName = doc.getString("userName").orEmpty(),
-            equipmentId = doc.getString("equipmentId").orEmpty(),
+            id            = doc.id,
+            uid           = doc.getString("uid").orEmpty(),
+            userName      = doc.getString("userName").orEmpty(),
+            equipmentId   = doc.getString("equipmentId").orEmpty(),
             equipmentName = doc.getString("equipmentName").orEmpty(),
-            boxNumber = (doc.get("boxNumber") as? Number)?.toInt() ?: 0,
-            type = doc.getString("type").orEmpty(),
-            timestamp = (doc.get("timestamp") as? Number)?.toLong() ?: 0L
+            boxNumber     = (doc.get("boxNumber") as? Number)?.toInt() ?: 0,
+            type          = doc.getString("type").orEmpty(),
+            timestamp     = (doc.get("timestamp") as? Number)?.toLong() ?: 0L,
+            originalDueAt = (doc.get("originalDueAt") as? Number)?.toLong() ?: 0L,
+            currentDueAt  = (doc.get("currentDueAt") as? Number)?.toLong() ?: 0L,
+            extensionCount = (doc.get("extensionCount") as? Number)?.toInt() ?: 0
         )
     }
 }

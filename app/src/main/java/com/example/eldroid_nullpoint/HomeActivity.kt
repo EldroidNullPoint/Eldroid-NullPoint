@@ -194,6 +194,38 @@ class HomeActivity : AppCompatActivity(), HomeContract.View {
         binding.tvOfflineBanner.visibility = if (offline) View.VISIBLE else View.GONE
     }
 
+    /**
+     * Spec §3, §35 — show the appropriate account/RFID status message.
+     * Hides the banner when the account is fully active with a working RFID card.
+     */
+    override fun showAccountStatusBanner(accountStatus: String, rfidStatus: String) {
+        val message: String? = when {
+            accountStatus == com.example.eldroid_nullpoint.model.User.ACCOUNT_PENDING ->
+                getString(R.string.account_status_pending)
+            accountStatus == com.example.eldroid_nullpoint.model.User.ACCOUNT_APPROVED_NO_RFID ||
+            (accountStatus == com.example.eldroid_nullpoint.model.User.ACCOUNT_ACTIVE &&
+             rfidStatus == com.example.eldroid_nullpoint.model.User.RFID_NOT_ISSUED) ->
+                getString(R.string.account_status_approved_no_rfid)
+            accountStatus == com.example.eldroid_nullpoint.model.User.ACCOUNT_SUSPENDED ->
+                getString(R.string.account_status_suspended)
+            accountStatus == com.example.eldroid_nullpoint.model.User.ACCOUNT_OVERDUE_RESTRICTED ->
+                getString(R.string.account_status_overdue_restricted)
+            rfidStatus == com.example.eldroid_nullpoint.model.User.RFID_DISABLED ->
+                getString(R.string.account_rfid_disabled)
+            rfidStatus == com.example.eldroid_nullpoint.model.User.RFID_LOST ->
+                getString(R.string.account_rfid_lost)
+            rfidStatus == com.example.eldroid_nullpoint.model.User.RFID_REPLACEMENT_REQUIRED ->
+                getString(R.string.account_rfid_replacement)
+            else -> null  // ACCOUNT_ACTIVE + RFID_ACTIVE — no banner needed
+        }
+        if (message != null) {
+            binding.tvAccountStatusBanner.text = message
+            binding.tvAccountStatusBanner.visibility = View.VISIBLE
+        } else {
+            binding.tvAccountStatusBanner.visibility = View.GONE
+        }
+    }
+
     override fun updateGreeting(text: String) {
         binding.tvGreeting.text = text
     }

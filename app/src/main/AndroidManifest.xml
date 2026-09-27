@@ -83,6 +83,12 @@
             android:name=".BorrowConfirmationActivity"
             android:exported="false" />
 
+        <!-- Extension request for an active loan (spec §15). -->
+        <activity
+            android:name=".ExtensionRequestActivity"
+            android:exported="false"
+            android:windowSoftInputMode="adjustResize" />
+
         <activity
             android:name=".NotificationsActivity"
             android:exported="false" />

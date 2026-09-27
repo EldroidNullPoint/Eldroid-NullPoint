@@ -29,6 +29,8 @@ class EquipmentDetailPresenter(
     private var currentEquipment: Equipment? = null
     private var isSubmitting = false
 
+    private var currentTransactionId: String = ""
+
     override fun onStart() {
         if (equipmentId.isBlank()) {
             view?.close()
@@ -139,20 +141,53 @@ class EquipmentDetailPresenter(
         currentEquipment = equipment
         view?.renderEquipment(equipment, currentUid)
         renderActions(equipment)
+        // Fetch the active transaction ID so the extension screen can reference it
+        if (equipment.isBorrowedBy(currentUid) && currentTransactionId.isBlank()) {
+            loadActiveTransactionId(equipment.id)
+        }
+    }
+
+    private fun loadActiveTransactionId(equipmentId: String) {
+        firestore.collection(com.example.eldroid_nullpoint.model.Transaction.COLLECTION)
+            .whereEqualTo("uid", currentUid)
+            .whereEqualTo("equipmentId", equipmentId)
+            .whereEqualTo("type", com.example.eldroid_nullpoint.model.Transaction.TYPE_BORROW)
+            .orderBy("timestamp", com.google.firebase.firestore.Query.Direction.DESCENDING)
+            .limit(1)
+            .get()
+            .addOnSuccessListener { snapshot ->
+                currentTransactionId = snapshot.documents.firstOrNull()?.id.orEmpty()
+            }
     }
 
     private fun renderActions(equipment: Equipment) {
         if (isSubmitting) return
 
-        // Spec §5.1, §16.6 — items in maintenance/fault/lost/etc. are not borrowable
         val canBorrow = !DemoData.isDemoId(equipment.id) &&
                 LoanPolicy.canBorrow(equipment, currentUid) == LoanPolicy.BorrowCheck.OK
         val canReturn = !DemoData.isDemoId(equipment.id) &&
                 LoanPolicy.canReturn(equipment, currentUid) == LoanPolicy.ReturnCheck.OK
 
+        // Spec §15 — show Request Extension when borrower owns the active loan
+        // and it is not a demo item. The extension screen handles the
+        // pending-request check itself.
+        val canRequestExtension = !DemoData.isDemoId(equipment.id) &&
+                equipment.isBorrowedBy(currentUid) && equipment.isBorrowed
+
         view?.showBorrowButton(canBorrow)
         view?.showReturnButton(canReturn)
-        view?.showActionArea(canBorrow || canReturn)
+        view?.showExtensionButton(canRequestExtension)
+        view?.showActionArea(canBorrow || canReturn || canRequestExtension)
+    }
+
+    fun onExtensionClicked() {
+        val equipment = currentEquipment ?: return
+        view?.navigateToExtensionRequest(
+            equipmentId   = equipment.id,
+            equipmentName = equipment.name,
+            transactionId = currentTransactionId,
+            currentDueAt  = equipment.dueAt
+        )
     }
 
     private fun setSubmitting(submitting: Boolean) {

@@ -156,7 +156,7 @@
                 tools:text="Sep 10, 3:12 PM" />
         </LinearLayout>
 
-        <!-- ============ Borrow / Return action ============ -->
+        <!-- ============ Borrow / Return / Extension actions ============ -->
         <LinearLayout
             android:id="@+id/actionArea"
             android:layout_width="match_parent"
@@ -205,6 +205,21 @@
                     android:indeterminateTint="@color/brand_green"
                     android:visibility="gone" />
             </FrameLayout>
+
+            <!-- Spec §15: Extension request button — shown when borrower owns the active loan -->
+            <Button
+                android:id="@+id/btnRequestExtension"
+                android:layout_width="match_parent"
+                android:layout_height="48dp"
+                android:layout_marginTop="10dp"
+                android:background="@drawable/bg_card_muted"
+                android:elevation="0dp"
+                android:text="@string/btn_request_extension"
+                android:textAllCaps="false"
+                android:textColor="@color/brand_dark_green"
+                android:textSize="14sp"
+                android:textStyle="bold"
+                android:visibility="gone" />
 
             <TextView
                 android:layout_width="match_parent"

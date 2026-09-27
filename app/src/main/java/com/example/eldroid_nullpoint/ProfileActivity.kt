@@ -159,6 +159,47 @@ class ProfileActivity : AppCompatActivity(), ProfileContract.View {
         )
     }
 
+    /** Spec §4 — show the user-friendly RFID status label. */
+    override fun renderRfidStatusLabel(rfidStatus: String) {
+        val (label, background, textColor) = when (rfidStatus) {
+            User.RFID_ACTIVE -> Triple(
+                getString(R.string.rfid_status_active),
+                R.drawable.bg_pill_available,
+                R.color.brand_dark_green
+            )
+            User.RFID_DISABLED -> Triple(
+                getString(R.string.rfid_status_disabled),
+                R.drawable.bg_pill_overdue,
+                R.color.error_red
+            )
+            User.RFID_LOST -> Triple(
+                getString(R.string.rfid_status_lost),
+                R.drawable.bg_pill_overdue,
+                R.color.error_red
+            )
+            User.RFID_REPLACEMENT_REQUIRED -> Triple(
+                getString(R.string.rfid_status_replacement),
+                R.drawable.bg_pill_due_soon,
+                R.color.warning_amber
+            )
+            else -> Triple(  // RFID_NOT_ISSUED
+                getString(R.string.rfid_status_not_issued),
+                R.drawable.bg_pill_due_soon,
+                R.color.warning_amber
+            )
+        }
+        binding.tvRfidStatus.text = label
+        binding.tvRfidStatus.setBackgroundResource(background)
+        binding.tvRfidStatus.setTextColor(ContextCompat.getColor(this, textColor))
+    }
+
+    /** Spec §2 — show the account lifecycle state. */
+    override fun showAccountStatusLabel(accountStatus: String) {
+        // No dedicated account status view in current layout — show via RFID status
+        // area using tvRfidStatus when account is not yet active.
+        // Future enhancement: add a dedicated tvAccountStatus view to the layout.
+    }
+
     override fun showFirstNameError(message: String) {
         showError(binding.tvFirstNameError, message)
     }

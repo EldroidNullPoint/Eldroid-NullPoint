@@ -10,6 +10,9 @@ interface ProfileContract {
         fun populateFields(user: User)
         fun renderName(firstName: String, lastName: String)
         fun renderRfidStatus(registered: Boolean)
+        /** Spec §4 — show the user-friendly RFID status label (not issued/active/disabled/lost). */
+        fun renderRfidStatusLabel(rfidStatus: String)
+        fun showAccountStatusLabel(accountStatus: String)
         fun showFirstNameError(message: String)
         fun showLastNameError(message: String)
         fun showRfidError(message: String)

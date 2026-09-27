@@ -174,8 +174,11 @@ class HomePresenter(
     private fun loadGreeting() {
         firestore.collection("users").document(currentUid).get()
             .addOnSuccessListener { snapshot ->
-                val firstName = snapshot.getString("firstName").orEmpty().trim()
-                val lastName = snapshot.getString("lastName").orEmpty().trim()
+                val profile = snapshot.toObject(com.example.eldroid_nullpoint.model.User::class.java)
+                    ?: com.example.eldroid_nullpoint.model.User(uid = currentUid)
+
+                val firstName = profile.firstName.trim()
+                val lastName  = profile.lastName.trim()
                 borrowerName = listOf(firstName, lastName)
                     .filter { it.isNotBlank() }
                     .joinToString(" ")
@@ -185,8 +188,14 @@ class HomePresenter(
                     if (firstName.isBlank()) prefix else "$prefix, $firstName"
                 )
 
-                val rfidCardUid = snapshot.getString("rfidCardUid").orEmpty().trim()
-                view?.showRfidWarning(rfidCardUid.isBlank())
+                // Spec §3, §35 — show account/RFID status warnings
+                view?.showAccountStatusBanner(profile.accountStatus, profile.rfidStatus)
+
+                // Legacy RFID warning (kept for layout compatibility)
+                view?.showRfidWarning(
+                    profile.accountStatus == com.example.eldroid_nullpoint.model.User.ACCOUNT_ACTIVE &&
+                    profile.rfidCardUid.isBlank()
+                )
             }
     }
 

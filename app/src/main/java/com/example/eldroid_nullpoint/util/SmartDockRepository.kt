@@ -174,6 +174,29 @@ object SmartDockRepository {
     )
 
     // ---------------------------------------------------------------
+    // Extension Requests  (spec §15)
+    // ---------------------------------------------------------------
+
+    /**
+     * Submits an extension request for an active loan.
+     * Android must never directly edit `dueAt` — it only creates this document
+     * and the admin approves/rejects via Web Admin.
+     */
+    fun submitExtensionRequest(
+        request: com.example.eldroid_nullpoint.model.ExtensionRequest
+    ): Task<Void> = firestore
+        .collection(com.example.eldroid_nullpoint.model.ExtensionRequest.COLLECTION)
+        .document(request.id)
+        .set(request.toMap())
+
+    /** Live stream of this borrower's extension requests. */
+    fun extensionRequestsForUser(
+        uid: String
+    ) = firestore
+        .collection(com.example.eldroid_nullpoint.model.ExtensionRequest.COLLECTION)
+        .whereEqualTo("uid", uid)
+
+    // ---------------------------------------------------------------
     // Notifications
     // ---------------------------------------------------------------
 

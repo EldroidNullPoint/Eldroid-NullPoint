@@ -38,12 +38,19 @@ class ProfilePresenter(
                 if (profile.email.isNotBlank()) view?.setEmail(profile.email)
                 view?.populateFields(profile)
                 view?.renderName(profile.firstName, profile.lastName)
-                view?.renderRfidStatus(profile.rfidCardUid.isNotBlank())
-                view?.showRfidWarning(profile.rfidCardUid.isBlank())
+                // Spec §4 — show proper RFID status label, not just registered/not
+                view?.renderRfidStatus(profile.rfidStatus == User.RFID_ACTIVE)
+                view?.renderRfidStatusLabel(profile.rfidStatus)
+                view?.showAccountStatusLabel(profile.accountStatus)
+                view?.showRfidWarning(
+                    profile.accountStatus == User.ACCOUNT_ACTIVE &&
+                    profile.rfidStatus != User.RFID_ACTIVE
+                )
             }
             .addOnFailureListener {
                 view?.showLoading(false)
                 view?.renderRfidStatus(false)
+                view?.renderRfidStatusLabel(User.RFID_NOT_ISSUED)
                 view?.showToast("Failed to load profile. Please try again.")
             }
     }

@@ -121,8 +121,14 @@ class SignupPresenter(
     }
 
     private fun saveUserProfile(user: User) {
-        firestore.collection("users").document(user.uid)
-            .set(user)
+        // Spec §3: new accounts start as pending_verification.
+        // Admin must approve before borrowing is permitted.
+        val pendingUser = user.copy(
+            accountStatus = User.ACCOUNT_PENDING,
+            rfidStatus = User.RFID_NOT_ISSUED
+        )
+        firestore.collection("users").document(pendingUser.uid)
+            .set(pendingUser)
             .addOnCompleteListener {
                 view?.showLoading(false)
                 view?.navigateToHome()
@@ -146,13 +152,16 @@ class SignupPresenter(
             .addOnSuccessListener { snapshot ->
                 view?.showLoading(false)
                 if (!snapshot.exists()) {
+                    // Spec §3: Google sign-up also starts as pending_verification.
                     docRef.set(
                         User(
                             uid = uid,
                             firstName = firstName,
                             lastName = lastName,
                             email = email,
-                            provider = provider
+                            provider = provider,
+                            accountStatus = User.ACCOUNT_PENDING,
+                            rfidStatus = User.RFID_NOT_ISSUED
                         )
                     )
                 }

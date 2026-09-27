@@ -72,6 +72,41 @@
     <string name="error_offline_action">You\'re offline. Connect to the internet to borrow or return equipment.</string>
     <string name="error_contact_admin">Borrowing unavailable. Please contact the administrator.</string>
 
+    <!-- Account / RFID status banners (spec §3, §4, §35) -->
+    <string name="account_status_pending">Account created. Borrower access is awaiting administrator verification.</string>
+    <string name="account_status_approved_no_rfid">Account approved. RFID card issuance required before borrowing at the tower.</string>
+    <string name="account_status_suspended">Your account has been suspended. Please contact the administrator.</string>
+    <string name="account_status_overdue_restricted">You have an overdue item. Return it before borrowing again.</string>
+    <string name="account_rfid_disabled">Your RFID card has been disabled. Contact the administrator.</string>
+    <string name="account_rfid_lost">Your RFID card has been reported lost. Contact the administrator for a replacement.</string>
+    <string name="account_rfid_replacement">RFID card replacement required. Contact the administrator.</string>
+
+    <!-- Profile RFID status labels (spec §4) -->
+    <string name="rfid_status_not_issued">RFID Not Yet Issued</string>
+    <string name="rfid_status_active">RFID Active</string>
+    <string name="rfid_status_disabled">RFID Disabled</string>
+    <string name="rfid_status_lost">RFID Reported Lost</string>
+    <string name="rfid_status_replacement">RFID Replacement Required</string>
+    <!-- Account status label for profile screen -->
+    <string name="account_label_pending">Pending Verification</string>
+    <string name="account_label_approved_no_rfid">Approved — RFID Required</string>
+    <string name="account_label_active">Active</string>
+    <string name="account_label_suspended">Suspended</string>
+    <string name="account_label_overdue_restricted">Overdue Restricted</string>
+    <string name="account_label_rejected">Rejected</string>
+    <!-- Extension request screen (spec §15) -->
+    <string name="title_extension_request">Request Extension</string>
+    <string name="extension_pending_notice">Extension request submitted. Your current due time remains unchanged until approved.</string>
+    <string name="extension_approved_notice">Extension approved. New due time: %1$s</string>
+    <string name="extension_rejected_notice">Extension declined. Original due time remains: %1$s</string>
+    <string name="extension_reason_hint">Reason (e.g. class still ongoing, presenter requested continued use)</string>
+    <string name="btn_request_extension">Request Extension</string>
+    <string name="extension_duration_30min">+30 minutes</string>
+    <string name="extension_duration_60min">+1 hour</string>
+    <string name="error_extension_reason_required">Please provide a reason for your extension request.</string>
+    <string name="error_extension_already_pending">You already have a pending extension request for this item.</string>
+    <string name="time_remaining">Time remaining: %1$s</string>
+
     <!-- Dashboard -->
     <string name="greeting_morning">Good morning</string>
     <string name="greeting_afternoon">Good afternoon</string>

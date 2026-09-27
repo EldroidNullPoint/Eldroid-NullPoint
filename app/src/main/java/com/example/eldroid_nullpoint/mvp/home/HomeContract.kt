@@ -22,6 +22,12 @@ interface HomeContract {
         fun navigateToLogin()
         /** Show or hide the offline banner. Spec §4.5 */
         fun showOfflineBanner(offline: Boolean)
+        /**
+         * Show account/RFID status messaging. Spec §3, §35.
+         * @param accountStatus the raw `accountStatus` field from Firestore
+         * @param rfidStatus the raw `rfidStatus` field from Firestore
+         */
+        fun showAccountStatusBanner(accountStatus: String, rfidStatus: String)
     }
 
     interface Presenter {
