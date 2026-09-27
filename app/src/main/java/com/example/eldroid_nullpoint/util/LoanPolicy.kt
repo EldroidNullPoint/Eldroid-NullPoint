@@ -48,8 +48,8 @@ object LoanPolicy {
         "status" to Equipment.STATUS_AVAILABLE,
         "borrowedBy" to "",
         "borrowedByName" to "",
-        "borrowedAt" to 0,   // Int 0, not Long 0L — matches Firestore rule: incoming().borrowedAt == 0
-        "dueAt" to 0         // Int 0, not Long 0L — matches Firestore rule: incoming().dueAt == 0
+        "borrowedAt" to 0L,
+        "dueAt" to 0L
     )
 
     /** New `transactions/{autoId}` document for a borrow or return event. */

@@ -13,9 +13,7 @@ service cloud.firestore {
     }
 
     // ------------------------------------------------------------------
-    // users/{uid} - one profile per borrower, owned by that borrower.
-    // The Profile screen updates firstName, lastName, rfidCardUid and
-    // notificationsEnabled; nothing else in the app touches it after sign-up.
+    // users/{uid}
     // ------------------------------------------------------------------
     match /users/{userId} {
       allow read: if isMe(userId);
@@ -26,89 +24,82 @@ service cloud.firestore {
     }
 
     // ------------------------------------------------------------------
-    // equipment/{boxId} - one document per SmartDock box.
-    // Any signed-in borrower can read availability (FR-10). Writes are limited
-    // to the two state transitions the app (or the tower) performs, and the
-    // shapes below mirror LoanPolicy.borrowUpdate() / returnUpdate() exactly.
+    // equipment/{boxId}
     // ------------------------------------------------------------------
     match /equipment/{boxId} {
       function incoming() { return request.resource.data; }
-      function current() { return resource.data; }
+      function current()  { return resource.data; }
 
       function staticFieldsUnchanged() {
-        return incoming().name == current().name
-          && incoming().category == current().category
-          && incoming().boxNumber == current().boxNumber;
+        return incoming().name       == current().name
+            && incoming().category   == current().category
+            && incoming().boxNumber  == current().boxNumber;
       }
 
-      // available -> borrowed by the caller, with a due time after the borrow time.
+      // available -> borrowed by the caller.
+      // borrowedAt / dueAt are epoch-millisecond Longs — use `is number` not `is int`.
       function isBorrow() {
-        return current().status == 'available'
-          && incoming().status == 'borrowed'
-          && incoming().borrowedBy == request.auth.uid
-          && incoming().borrowedByName is string
-          && incoming().borrowedAt is int && incoming().borrowedAt > 0
-          && incoming().dueAt is int && incoming().dueAt > incoming().borrowedAt
-          && staticFieldsUnchanged();
+        return current().status      == 'available'
+            && incoming().status     == 'borrowed'
+            && incoming().borrowedBy == request.auth.uid
+            && incoming().borrowedByName is string
+            && incoming().borrowedAt is number && incoming().borrowedAt > 0
+            && incoming().dueAt      is number && incoming().dueAt > incoming().borrowedAt
+            && staticFieldsUnchanged();
       }
 
-      // borrowed by the caller -> available, with every loan field cleared.
+      // borrowed by the caller -> available, all loan fields cleared to 0.
       function isReturn() {
-        return current().status == 'borrowed'
-          && current().borrowedBy == request.auth.uid
-          && incoming().status == 'available'
-          && incoming().borrowedBy == ''
-          && incoming().borrowedByName == ''
-          && incoming().borrowedAt == 0
-          && incoming().dueAt == 0
-          && staticFieldsUnchanged();
+        return current().status      == 'borrowed'
+            && current().borrowedBy  == request.auth.uid
+            && incoming().status     == 'available'
+            && incoming().borrowedBy == ''
+            && incoming().borrowedByName == ''
+            && incoming().borrowedAt == 0
+            && incoming().dueAt      == 0
+            && staticFieldsUnchanged();
       }
 
-      allow read: if signedIn();
-
-      // Seeding the sample boxes: only brand-new, available documents.
+      allow read:   if signedIn();
       allow create: if signedIn()
-        && incoming().name is string && incoming().name.size() > 0
-        && incoming().category is string
-        && incoming().boxNumber is int && incoming().boxNumber > 0
-        && incoming().status == 'available'
+        && incoming().name       is string && incoming().name.size() > 0
+        && incoming().category   is string
+        && incoming().boxNumber  is number && incoming().boxNumber > 0
+        && incoming().status     == 'available'
         && incoming().borrowedBy == ''
         && incoming().borrowedByName == ''
         && incoming().borrowedAt == 0
-        && incoming().dueAt == 0;
-
+        && incoming().dueAt      == 0;
       allow update: if signedIn() && (isBorrow() || isReturn());
       allow delete: if false;
     }
 
     // ------------------------------------------------------------------
-    // transactions/{autoId} - append-only borrow / return log.
-    // A borrower only ever reads their own rows (the app queries
-    // whereEqualTo("uid", auth.uid), which satisfies the read rule).
+    // transactions/{autoId}
+    // timestamp is epoch-millis Long — use `is number` not `is int`.
     // ------------------------------------------------------------------
     match /transactions/{txnId} {
       allow read: if signedIn() && resource.data.uid == request.auth.uid;
       allow create: if signedIn()
-        && request.resource.data.uid == request.auth.uid
-        && request.resource.data.type in ['borrow', 'return']
+        && request.resource.data.uid         == request.auth.uid
+        && request.resource.data.type        in ['borrow', 'return']
         && request.resource.data.equipmentId is string
-        && request.resource.data.boxNumber is int
-        && request.resource.data.timestamp is int;
+        && request.resource.data.boxNumber   is number
+        && request.resource.data.timestamp   is number;
       allow update, delete: if false;
     }
 
     // ------------------------------------------------------------------
-    // notifications/{id} - the borrower's inbox (borrow/return confirmations
-    // and due-soon / overdue reminders). Created unread; the only later change
-    // allowed is flipping `read` to true.
+    // notifications/{id}
+    // createdAt is epoch-millis Long — use `is number` not `is int`.
     // ------------------------------------------------------------------
     match /notifications/{notificationId} {
       allow read: if signedIn() && resource.data.uid == request.auth.uid;
       allow create: if signedIn()
-        && request.resource.data.uid == request.auth.uid
-        && request.resource.data.read == false
-        && request.resource.data.type in ['borrow', 'return', 'due_soon', 'overdue']
-        && request.resource.data.createdAt is int;
+        && request.resource.data.uid       == request.auth.uid
+        && request.resource.data.read      == false
+        && request.resource.data.type      in ['borrow', 'return', 'due_soon', 'overdue']
+        && request.resource.data.createdAt is number;
       allow update: if signedIn()
         && resource.data.uid == request.auth.uid
         && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['read'])
