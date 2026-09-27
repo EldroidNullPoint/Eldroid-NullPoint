@@ -29,6 +29,7 @@ class EquipmentDetailActivity : AppCompatActivity(), EquipmentDetailContract.Vie
 
     private lateinit var binding: ActivityEquipmentDetailBinding
     private lateinit var presenter: EquipmentDetailPresenter
+    private var currentEquipment: Equipment? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -81,10 +82,11 @@ class EquipmentDetailActivity : AppCompatActivity(), EquipmentDetailContract.Vie
     }
 
     private fun confirmBorrow() {
+        val equipment = currentEquipment ?: return
         com.example.eldroid_nullpoint.util.DebugBroadcaster.broadcast("🟦 Confirm borrow dialog shown")
         MaterialAlertDialogBuilder(this)
-            .setTitle(getString(R.string.borrow_confirm_title, binding.tvName.text.toString()))
-            .setMessage(getString(R.string.borrow_confirm_message, binding.tvBox.text.toString()))
+            .setTitle(getString(R.string.borrow_confirm_title, equipment.name))
+            .setMessage(getString(R.string.borrow_confirm_message, equipment.boxNumber))
             .setNegativeButton(R.string.btn_cancel) { _, _ ->
                 com.example.eldroid_nullpoint.util.DebugBroadcaster.broadcast("❎ User cancelled borrow")
             }
@@ -96,10 +98,11 @@ class EquipmentDetailActivity : AppCompatActivity(), EquipmentDetailContract.Vie
     }
 
     private fun confirmReturn() {
+        val equipment = currentEquipment ?: return
         com.example.eldroid_nullpoint.util.DebugBroadcaster.broadcast("🟦 Confirm return dialog shown")
         MaterialAlertDialogBuilder(this)
-            .setTitle(getString(R.string.return_confirm_title, binding.tvName.text.toString()))
-            .setMessage(getString(R.string.return_confirm_message, binding.tvBox.text.toString()))
+            .setTitle(getString(R.string.return_confirm_title, equipment.name))
+            .setMessage(getString(R.string.return_confirm_message, equipment.boxNumber))
             .setNegativeButton(R.string.btn_cancel) { _, _ ->
                 com.example.eldroid_nullpoint.util.DebugBroadcaster.broadcast("❎ User cancelled return")
             }
@@ -115,6 +118,8 @@ class EquipmentDetailActivity : AppCompatActivity(), EquipmentDetailContract.Vie
     // ---------------------------------------------------------------
 
     override fun renderEquipment(equipment: Equipment, currentUid: String) {
+        currentEquipment = equipment  // Store for use in confirm dialogs
+        
         val isMine = equipment.isBorrowedBy(currentUid)
         val isOverdue = equipment.isOverdue()
 
