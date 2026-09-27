@@ -16,12 +16,13 @@ object LoanPolicy {
 
     fun dueAtFor(borrowedAt: Long): Long = borrowedAt + LOAN_DURATION_MS
 
-    enum class BorrowCheck { OK, NOT_SIGNED_IN, NOT_FOUND, ALREADY_BORROWED }
+    enum class BorrowCheck { OK, NOT_SIGNED_IN, NOT_FOUND, ALREADY_BORROWED, UNAVAILABLE }
     enum class ReturnCheck { OK, NOT_SIGNED_IN, NOT_FOUND, NOT_BORROWED, NOT_YOURS }
 
     fun canBorrow(equipment: Equipment?, uid: String): BorrowCheck = when {
         uid.isBlank() -> BorrowCheck.NOT_SIGNED_IN
         equipment == null -> BorrowCheck.NOT_FOUND
+        equipment.isUnavailable -> BorrowCheck.UNAVAILABLE
         equipment.isBorrowed -> BorrowCheck.ALREADY_BORROWED
         else -> BorrowCheck.OK
     }

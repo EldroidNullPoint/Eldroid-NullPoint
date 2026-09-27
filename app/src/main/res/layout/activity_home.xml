@@ -27,40 +27,20 @@
             android:paddingTop="24dp"
             android:paddingBottom="32dp">
 
-            <!-- ===== TEST BANNER — delete this after confirming new build runs ===== -->
+            <!-- ===== OFFLINE BANNER (spec §4.5) — shown when phone loses internet ===== -->
             <TextView
-                android:id="@+id/tvTestBanner"
+                android:id="@+id/tvOfflineBanner"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:background="#FF0000"
-                android:gravity="center"
+                android:background="#CC5500"
+                android:drawablePadding="8dp"
+                android:gravity="center_vertical"
                 android:padding="12dp"
-                android:text="✅ NEW BUILD v4 IS RUNNING — DELETE ME"
+                android:text="@string/offline_banner"
                 android:textColor="#FFFFFF"
-                android:textSize="14sp"
-                android:textStyle="bold"
+                android:textSize="13sp"
+                android:visibility="gone"
                 android:layout_marginBottom="8dp" />
-            <!-- ===== END TEST BANNER ===== -->
-
-            <!-- ===== DEBUG BANNER — shows actual error messages ===== -->
-            <ScrollView
-                android:layout_width="match_parent"
-                android:layout_height="120dp"
-                android:background="#FFA500"
-                android:layout_marginBottom="16dp">
-                
-                <TextView
-                    android:id="@+id/tvDebugBanner"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:gravity="start"
-                    android:padding="12dp"
-                    android:text="🔍 Debug: Waiting for borrow/return attempt..."
-                    android:textColor="#000000"
-                    android:textSize="11sp"
-                    android:fontFamily="monospace" />
-            </ScrollView>
-            <!-- ===== END DEBUG BANNER ===== -->
 
             <!-- ============ Header / greeting ============ -->
             <LinearLayout

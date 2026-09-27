@@ -56,14 +56,8 @@ class EquipmentDetailActivity : AppCompatActivity(), EquipmentDetailContract.Vie
         presenter.loadBorrowerName()
 
         binding.ivBack.setOnClickListener { finish() }
-        binding.btnBorrow.setOnClickListener { 
-            com.example.eldroid_nullpoint.util.DebugBroadcaster.broadcast("🔴 BORROW BUTTON CLICKED")
-            confirmBorrow() 
-        }
-        binding.btnReturn.setOnClickListener { 
-            com.example.eldroid_nullpoint.util.DebugBroadcaster.broadcast("🔴 RETURN BUTTON CLICKED")
-            confirmReturn() 
-        }
+        binding.btnBorrow.setOnClickListener { confirmBorrow() }
+        binding.btnReturn.setOnClickListener { confirmReturn() }
     }
 
     override fun onStart() {
@@ -81,35 +75,27 @@ class EquipmentDetailActivity : AppCompatActivity(), EquipmentDetailContract.Vie
         presenter.detach()
     }
 
+    // ---------------------------------------------------------------
+    // Confirm dialogs
+    // ---------------------------------------------------------------
+
     private fun confirmBorrow() {
         val equipment = currentEquipment ?: return
-        com.example.eldroid_nullpoint.util.DebugBroadcaster.broadcast("🟦 Confirm borrow dialog shown")
         MaterialAlertDialogBuilder(this)
             .setTitle(getString(R.string.borrow_confirm_title, equipment.name))
             .setMessage(getString(R.string.borrow_confirm_message, equipment.boxNumber))
-            .setNegativeButton(R.string.btn_cancel) { _, _ ->
-                com.example.eldroid_nullpoint.util.DebugBroadcaster.broadcast("❎ User cancelled borrow")
-            }
-            .setPositiveButton(R.string.btn_confirm) { _, _ ->
-                com.example.eldroid_nullpoint.util.DebugBroadcaster.broadcast("✔️ User confirmed borrow - calling presenter")
-                presenter.onBorrowConfirmed()
-            }
+            .setNegativeButton(R.string.btn_cancel, null)
+            .setPositiveButton(R.string.btn_confirm) { _, _ -> presenter.onBorrowConfirmed() }
             .show()
     }
 
     private fun confirmReturn() {
         val equipment = currentEquipment ?: return
-        com.example.eldroid_nullpoint.util.DebugBroadcaster.broadcast("🟦 Confirm return dialog shown")
         MaterialAlertDialogBuilder(this)
             .setTitle(getString(R.string.return_confirm_title, equipment.name))
             .setMessage(getString(R.string.return_confirm_message, equipment.boxNumber))
-            .setNegativeButton(R.string.btn_cancel) { _, _ ->
-                com.example.eldroid_nullpoint.util.DebugBroadcaster.broadcast("❎ User cancelled return")
-            }
-            .setPositiveButton(R.string.btn_confirm) { _, _ ->
-                com.example.eldroid_nullpoint.util.DebugBroadcaster.broadcast("✔️ User confirmed return - calling presenter")
-                presenter.onReturnConfirmed()
-            }
+            .setNegativeButton(R.string.btn_cancel, null)
+            .setPositiveButton(R.string.btn_confirm) { _, _ -> presenter.onReturnConfirmed() }
             .show()
     }
 
@@ -118,15 +104,27 @@ class EquipmentDetailActivity : AppCompatActivity(), EquipmentDetailContract.Vie
     // ---------------------------------------------------------------
 
     override fun renderEquipment(equipment: Equipment, currentUid: String) {
-        currentEquipment = equipment  // Store for use in confirm dialogs
-        
+        currentEquipment = equipment
+
         val isMine = equipment.isBorrowedBy(currentUid)
         val isOverdue = equipment.isOverdue()
 
         binding.tvName.text = equipment.name.ifBlank { getString(R.string.title_equipment_detail) }
-        EquipmentImages.bindInto(binding.ivPhoto, equipment.name, equipment.category, equipment.imageData, fallbackPaddingDp = 60)
+        EquipmentImages.bindInto(
+            binding.ivPhoto, equipment.name, equipment.category,
+            equipment.imageData, fallbackPaddingDp = 60
+        )
 
+        // ── Status pill ────────────────────────────────────────────
+        // Spec §5.1, §16.6: admin-set unavailable states (maintenance, damaged,
+        // sensor_fault, lost, etc.) show "Temporarily Unavailable" to borrowers
+        // without exposing internal hardware/admin details.
         val (statusLabel, pillBackground, pillTextColor) = when {
+            equipment.isUnavailable -> Triple(
+                getString(R.string.status_unavailable),
+                R.drawable.bg_pill_neutral,
+                R.color.text_secondary
+            )
             isMine && isOverdue -> Triple(
                 getString(R.string.status_overdue),
                 R.drawable.bg_pill_overdue,
@@ -152,13 +150,21 @@ class EquipmentDetailActivity : AppCompatActivity(), EquipmentDetailContract.Vie
         binding.tvStatusPill.setBackgroundResource(pillBackground)
         binding.tvStatusPill.setTextColor(ContextCompat.getColor(this, pillTextColor))
 
+        // ── Hint text ──────────────────────────────────────────────
         binding.tvHint.text = when {
-            isMine && isOverdue -> getString(R.string.detail_hint_overdue, equipment.boxNumber)
-            isMine -> getString(R.string.detail_hint_return, equipment.boxNumber)
-            equipment.isBorrowed -> getString(R.string.detail_hint_unavailable, equipment.boxNumber)
-            else -> getString(R.string.detail_hint_borrow, equipment.boxNumber)
+            equipment.isUnavailable ->
+                getString(R.string.detail_hint_unavailable_maintenance)
+            isMine && isOverdue ->
+                getString(R.string.detail_hint_overdue, equipment.boxNumber)
+            isMine ->
+                getString(R.string.detail_hint_return, equipment.boxNumber)
+            equipment.isBorrowed ->
+                getString(R.string.detail_hint_unavailable, equipment.boxNumber)
+            else ->
+                getString(R.string.detail_hint_borrow, equipment.boxNumber)
         }
 
+        // ── Detail rows ────────────────────────────────────────────
         binding.rowCategory.visibility = if (equipment.category.isBlank()) View.GONE else View.VISIBLE
         binding.tvCategory.text = equipment.category
         binding.tvBox.text = getString(R.string.box_label, equipment.boxNumber)
@@ -214,31 +220,14 @@ class EquipmentDetailActivity : AppCompatActivity(), EquipmentDetailContract.Vie
     }
 
     override fun showToast(message: String) {
-        // Use a dialog instead of toast so error messages are fully readable
-        // and don't auto-dismiss before you can read them
-        if (message.length > 60 || message.startsWith("FAILED") || message.startsWith("PERMISSION")) {
-            androidx.appcompat.app.AlertDialog.Builder(this)
-                .setTitle("Debug Info")
-                .setMessage(message)
-                .setPositiveButton("OK", null)
-                .show()
-        } else {
-            Toast.makeText(this, message, Toast.LENGTH_LONG).show()
-        }
+        Toast.makeText(this, message, Toast.LENGTH_LONG).show()
     }
 
     override fun showErrorDialog(message: String) {
-        androidx.appcompat.app.AlertDialog.Builder(this)
-            .setTitle("🔍 Error Diagnostic")
+        MaterialAlertDialogBuilder(this)
+            .setTitle(R.string.error_action_failed)
             .setMessage(message)
-            .setPositiveButton("COPY TO CLIPBOARD") { _, _ ->
-                val clipboard = getSystemService(Context.CLIPBOARD_SERVICE) as android.content.ClipboardManager
-                val clip = android.content.ClipData.newPlainText("Error Diagnostic", message)
-                clipboard.setPrimaryClip(clip)
-                Toast.makeText(this, "Error copied to clipboard", Toast.LENGTH_SHORT).show()
-            }
-            .setNegativeButton("CLOSE", null)
-            .setCancelable(true)
+            .setPositiveButton(R.string.btn_cancel, null)
             .show()
     }
 

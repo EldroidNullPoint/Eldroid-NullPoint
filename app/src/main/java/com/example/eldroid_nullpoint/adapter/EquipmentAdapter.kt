@@ -86,8 +86,13 @@ class EquipmentAdapter(
             val pillTextColor: Int
 
             when {
-                // Overdue is a borrower-facing state only for the signed-in
-                // borrower's own item; other people's items just read "Borrowed".
+                // Spec §5.1, §16.6 — admin-set unavailable states shown as
+                // "Temporarily Unavailable" without exposing hardware details.
+                equipment.isUnavailable -> {
+                    statusLabel = context.getString(R.string.status_unavailable)
+                    pillBackground = R.drawable.bg_pill_neutral
+                    pillTextColor = R.color.text_secondary
+                }
                 isMine && equipment.isOverdue() -> {
                     statusLabel = context.getString(R.string.status_overdue)
                     pillBackground = R.drawable.bg_pill_overdue

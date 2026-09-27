@@ -10,6 +10,7 @@ import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
+import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.eldroid_nullpoint.adapter.EquipmentAdapter
 import com.example.eldroid_nullpoint.adapter.TransactionAdapter
@@ -19,12 +20,15 @@ import com.example.eldroid_nullpoint.model.Transaction
 import com.example.eldroid_nullpoint.mvp.home.HomeContract
 import com.example.eldroid_nullpoint.mvp.home.HomePresenter
 import com.example.eldroid_nullpoint.util.EquipmentImages
+import com.example.eldroid_nullpoint.util.NetworkMonitor
 import com.example.eldroid_nullpoint.util.NotificationPrefs
 import com.example.eldroid_nullpoint.util.Notifier
 import com.example.eldroid_nullpoint.util.TimeFormat
 import com.example.eldroid_nullpoint.work.DueCheckWorker
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.google.firebase.auth.FirebaseAuth
+import kotlinx.coroutines.flow.launchIn
+import kotlinx.coroutines.flow.onEach
 
 class HomeActivity : AppCompatActivity(), HomeContract.View {
 
@@ -40,12 +44,6 @@ class HomeActivity : AppCompatActivity(), HomeContract.View {
     private lateinit var activityAdapter: TransactionAdapter
 
     private var currentUid: String = ""
-    
-    private val debugListener: (String) -> Unit = { message ->
-        runOnUiThread {
-            binding.tvDebugBanner.text = message
-        }
-    }
 
     private val notificationPermission =
         registerForActivityResult(ActivityResultContracts.RequestPermission()) { granted ->
@@ -69,13 +67,11 @@ class HomeActivity : AppCompatActivity(), HomeContract.View {
         setupRecyclerViews()
         setupHeaderActions()
         setupReminders()
-        setupFirebaseConnectionMonitor()
+        observeConnectivity()
     }
 
     override fun onStart() {
         super.onStart()
-        com.example.eldroid_nullpoint.util.DebugBroadcaster.addListener(debugListener)
-        com.example.eldroid_nullpoint.util.DebugBroadcaster.broadcast("🏠 HomeActivity onStart()")
         if (currentUid.isNotBlank()) presenter.onStart(currentUid)
     }
 
@@ -86,7 +82,6 @@ class HomeActivity : AppCompatActivity(), HomeContract.View {
 
     override fun onDestroy() {
         super.onDestroy()
-        com.example.eldroid_nullpoint.util.DebugBroadcaster.removeListener(debugListener)
         presenter.detach()
     }
 
@@ -154,23 +149,22 @@ class HomeActivity : AppCompatActivity(), HomeContract.View {
         }
     }
 
-    private fun setupFirebaseConnectionMonitor() {
-        // Add a test button to verify broadcast system works
-        binding.tvTestBanner.setOnClickListener {
-            com.example.eldroid_nullpoint.util.DebugBroadcaster.broadcast("🧪 TEST: Banner clicked at ${System.currentTimeMillis()}")
-        }
-        
-        // Test Firestore connectivity
-        com.google.firebase.firestore.FirebaseFirestore.getInstance()
-            .collection("equipment")
-            .limit(1)
-            .get()
-            .addOnSuccessListener {
-                com.example.eldroid_nullpoint.util.DebugBroadcaster.broadcast("Firestore: ✅ CONNECTED (read test passed)")
+    /**
+     * Spec §4.5: observe connectivity and show/hide the offline banner.
+     * When connectivity is restored, trigger a refresh so stale data is replaced
+     * with live data automatically.
+     */
+    private fun observeConnectivity() {
+        var previouslyOffline = false
+        NetworkMonitor.observe(this)
+            .onEach { isOnline ->
+                showOfflineBanner(!isOnline)
+                if (isOnline && previouslyOffline && currentUid.isNotBlank()) {
+                    presenter.onRefresh()
+                }
+                previouslyOffline = !isOnline
             }
-            .addOnFailureListener { e ->
-                com.example.eldroid_nullpoint.util.DebugBroadcaster.broadcast("Firestore: ❌ FAILED - ${e.javaClass.simpleName}: ${e.message}")
-            }
+            .launchIn(lifecycleScope)
     }
 
     // ---------------------------------------------------------------
@@ -195,6 +189,11 @@ class HomeActivity : AppCompatActivity(), HomeContract.View {
         binding.errorState.visibility = View.VISIBLE
     }
 
+    /** Spec §4.5 — show the orange offline banner when the phone has no internet. */
+    override fun showOfflineBanner(offline: Boolean) {
+        binding.tvOfflineBanner.visibility = if (offline) View.VISIBLE else View.GONE
+    }
+
     override fun updateGreeting(text: String) {
         binding.tvGreeting.text = text
     }
@@ -215,7 +214,7 @@ class HomeActivity : AppCompatActivity(), HomeContract.View {
             binding.tvAvailableCount.visibility = View.VISIBLE
             binding.tvAvailableCount.text = getString(
                 R.string.available_count,
-                equipment.count { !it.isBorrowed },
+                equipment.count { !it.isBorrowed && !it.isUnavailable },
                 equipment.size
             )
         }
@@ -246,7 +245,10 @@ class HomeActivity : AppCompatActivity(), HomeContract.View {
         }
 
         binding.tvCurrentName.text = item.name.ifBlank { "Unnamed equipment" }
-        EquipmentImages.bindInto(binding.ivCurrentPhoto, item.name, item.category, item.imageData, fallbackPaddingDp = 15)
+        EquipmentImages.bindInto(
+            binding.ivCurrentPhoto, item.name, item.category, item.imageData,
+            fallbackPaddingDp = 15
+        )
 
         val boxLabel = getString(R.string.box_label, item.boxNumber)
         binding.tvCurrentBox.text = if (item.category.isBlank()) boxLabel

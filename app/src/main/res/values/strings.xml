@@ -63,6 +63,15 @@
     <string name="error_current_password_required">Current password is required</string>
     <string name="error_password_same_as_current">New password must be different from your current password</string>
 
+    <!-- Connectivity / offline state (spec §4.5, §17.4) -->
+    <string name="offline_banner">You\'re offline — showing last known data. Availability may have changed.</string>
+    <string name="last_updated">Last updated %1$s</string>
+    <string name="status_unavailable">Temporarily Unavailable</string>
+    <string name="detail_hint_unavailable_maintenance">This item is temporarily unavailable. Please check back later or contact the equipment room administrator.</string>
+    <string name="detail_hint_unavailable_offline">Availability could not be confirmed. Check your connection and try again.</string>
+    <string name="error_offline_action">You\'re offline. Connect to the internet to borrow or return equipment.</string>
+    <string name="error_contact_admin">Borrowing unavailable. Please contact the administrator.</string>
+
     <!-- Dashboard -->
     <string name="greeting_morning">Good morning</string>
     <string name="greeting_afternoon">Good afternoon</string>

@@ -1,7 +1,5 @@
 package com.example.eldroid_nullpoint.model
 
-import com.google.firebase.firestore.DocumentSnapshot
-
 /**
  * One SmartDock box and the equipment inside it: `equipment/{boxId}`.
  *
@@ -14,7 +12,12 @@ data class Equipment(
     val name: String = "",
     val category: String = "",
     val boxNumber: Int = 0,
-    /** Exactly "available" or "borrowed". */
+    /**
+     * Primary lifecycle state written by the admin dashboard or IoT tower.
+     * Values: "available", "borrowed", "maintenance", "damaged", "retired",
+     *         "lost", "sensor_fault", "status_unknown", "unconfigured".
+     * The app treats any value other than "available"/"borrowed" as unavailable.
+     */
     val status: String = STATUS_AVAILABLE,
     val borrowedBy: String = "",
     val borrowedByName: String = "",
@@ -30,6 +33,13 @@ data class Equipment(
 ) {
     val isBorrowed: Boolean get() = status == STATUS_BORROWED
 
+    /** True when the equipment is in any state that prevents borrowing. */
+    val isUnavailable: Boolean
+        get() = status in setOf(
+            STATUS_MAINTENANCE, STATUS_DAMAGED, STATUS_RETIRED,
+            STATUS_LOST, STATUS_SENSOR_FAULT, STATUS_UNKNOWN, STATUS_UNCONFIGURED
+        )
+
     fun isBorrowedBy(uid: String): Boolean = uid.isNotBlank() && borrowedBy == uid
 
     /** True once the due time has passed while the item is still out. */
@@ -40,12 +50,20 @@ data class Equipment(
         const val COLLECTION = "equipment"
         const val STATUS_AVAILABLE = "available"
         const val STATUS_BORROWED = "borrowed"
+        // Admin / IoT-written states — borrower app treats these as unavailable
+        const val STATUS_MAINTENANCE = "maintenance"
+        const val STATUS_DAMAGED = "damaged"
+        const val STATUS_RETIRED = "retired"
+        const val STATUS_LOST = "lost"
+        const val STATUS_SENSOR_FAULT = "sensor_fault"
+        const val STATUS_UNKNOWN = "status_unknown"
+        const val STATUS_UNCONFIGURED = "unconfigured"
 
         /**
          * Reads a document defensively: the tower may write numeric fields as Long
          * or Double, and older documents may be missing fields entirely.
          */
-        fun from(doc: DocumentSnapshot): Equipment = Equipment(
+        fun from(doc: com.google.firebase.firestore.DocumentSnapshot): Equipment = Equipment(
             id = doc.id,
             name = doc.getString("name").orEmpty(),
             category = doc.getString("category").orEmpty(),

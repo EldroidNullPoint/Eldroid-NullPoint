@@ -1,12 +1,15 @@
 package com.example.eldroid_nullpoint.mvp.equipmentdetail
 
+import android.content.Context
+import android.util.Log
 import com.example.eldroid_nullpoint.model.Equipment
 import com.example.eldroid_nullpoint.util.DemoData
 import com.example.eldroid_nullpoint.util.LoanPolicy
+import com.example.eldroid_nullpoint.util.NetworkMonitor
 import com.example.eldroid_nullpoint.util.SmartDockRepository
 import com.example.eldroid_nullpoint.work.DueCheckWorker
-import android.content.Context
 import com.google.firebase.firestore.FirebaseFirestore
+import com.google.firebase.firestore.FirebaseFirestoreException
 import com.google.firebase.firestore.ListenerRegistration
 
 class EquipmentDetailPresenter(
@@ -17,6 +20,10 @@ class EquipmentDetailPresenter(
     private var borrowerName: String,
     private val firestore: FirebaseFirestore = FirebaseFirestore.getInstance()
 ) : EquipmentDetailContract.Presenter {
+
+    companion object {
+        private const val TAG = "EquipDetailPresenter"
+    }
 
     private var listener: ListenerRegistration? = null
     private var currentEquipment: Equipment? = null
@@ -39,25 +46,17 @@ class EquipmentDetailPresenter(
 
         listener = firestore.collection(Equipment.COLLECTION).document(equipmentId)
             .addSnapshotListener { snapshot, error ->
-                android.util.Log.d("DetailPresenter", "Snapshot listener fired for $equipmentId")
-                
                 if (error != null) {
-                    android.util.Log.e("DetailPresenter", "Snapshot error", error)
-                    com.example.eldroid_nullpoint.util.DebugBroadcaster.broadcast("Snapshot error: ${error.message}")
-                    view?.showToast("Failed to load equipment details")
+                    Log.e(TAG, "Snapshot error for $equipmentId", error)
+                    view?.showToast(context.getString(com.example.eldroid_nullpoint.R.string.error_action_failed))
                     return@addSnapshotListener
                 }
                 if (snapshot == null || !snapshot.exists()) {
-                    android.util.Log.w("DetailPresenter", "Equipment not found in snapshot")
-                    view?.showToast("Equipment not found")
+                    view?.showToast(context.getString(com.example.eldroid_nullpoint.R.string.detail_not_found))
                     view?.close()
                     return@addSnapshotListener
                 }
-                
-                val equipment = Equipment.from(snapshot)
-                android.util.Log.d("DetailPresenter", "Equipment status: ${equipment.status}, borrowedBy: ${equipment.borrowedBy}")
-                com.example.eldroid_nullpoint.util.DebugBroadcaster.broadcast("Equipment ${equipment.name} status: ${equipment.status}")
-                bind(equipment)
+                bind(Equipment.from(snapshot))
             }
     }
 
@@ -69,80 +68,59 @@ class EquipmentDetailPresenter(
     }
 
     override fun onBorrowConfirmed() {
-        com.example.eldroid_nullpoint.util.DebugBroadcaster.broadcast("🔄 onBorrowConfirmed() called")
-        android.util.Log.d("DetailPresenter", "onBorrowConfirmed() called")
-        
-        val equipment = currentEquipment
-        if (equipment == null) {
-            com.example.eldroid_nullpoint.util.DebugBroadcaster.broadcast("❌ No equipment loaded")
-            return
-        }
-        
-        if (isSubmitting) {
-            com.example.eldroid_nullpoint.util.DebugBroadcaster.broadcast("⚠️ Already submitting, ignoring")
-            return
-        }
-        
-        setSubmitting(true)
-        com.example.eldroid_nullpoint.util.DebugBroadcaster.broadcast("📤 Starting borrow transaction for: ${equipment.name}")
+        val equipment = currentEquipment ?: return
+        if (isSubmitting) return
 
-        android.util.Log.d("DetailPresenter", "Attempting borrow: id=${equipment.id} uid=$currentUid name=$borrowerName")
+        // Spec §4.5 — disable live-dependent actions when offline
+        if (!NetworkMonitor.isOnline(context)) {
+            view?.showToast(context.getString(com.example.eldroid_nullpoint.R.string.error_offline_action))
+            return
+        }
+
+        setSubmitting(true)
+        Log.d(TAG, "Borrow attempt: id=${equipment.id} uid=$currentUid name=$borrowerName")
 
         SmartDockRepository.borrow(equipment.id, currentUid, borrowerName)
             .addOnSuccessListener { receipt ->
-                android.util.Log.d("DetailPresenter", "Borrow SUCCESS: ${receipt.equipment.name}")
-                com.example.eldroid_nullpoint.util.DebugBroadcaster.broadcast("✅ Borrow SUCCESS: ${receipt.equipment.name}")
+                Log.d(TAG, "Borrow success: ${receipt.equipment.name}")
                 setSubmitting(false)
                 DueCheckWorker.runNow(context)
                 view?.navigateToBorrowConfirmation(receipt)
             }
             .addOnFailureListener { error ->
-                android.util.Log.e("DetailPresenter", "Borrow FAILURE", error)
-                val errorMsg = resolveActionError(error)
-                com.example.eldroid_nullpoint.util.DebugBroadcaster.broadcast("❌ Borrow FAILED: $errorMsg")
+                Log.e(TAG, "Borrow failed", error)
                 setSubmitting(false)
-                view?.showToast(errorMsg)
+                view?.showToast(resolveActionError(error))
             }
-            
-        com.example.eldroid_nullpoint.util.DebugBroadcaster.broadcast("⏳ Waiting for Firebase response...")
     }
 
     override fun onReturnConfirmed() {
-        com.example.eldroid_nullpoint.util.DebugBroadcaster.broadcast("🔄 onReturnConfirmed() called")
-        android.util.Log.d("DetailPresenter", "onReturnConfirmed() called")
-        
-        val equipment = currentEquipment
-        if (equipment == null) {
-            com.example.eldroid_nullpoint.util.DebugBroadcaster.broadcast("❌ No equipment loaded")
-            return
-        }
-        
-        if (isSubmitting) {
-            com.example.eldroid_nullpoint.util.DebugBroadcaster.broadcast("⚠️ Already submitting, ignoring")
-            return
-        }
-        
-        setSubmitting(true)
-        com.example.eldroid_nullpoint.util.DebugBroadcaster.broadcast("📤 Starting return transaction for: ${equipment.name}")
+        val equipment = currentEquipment ?: return
+        if (isSubmitting) return
 
-        android.util.Log.d("DetailPresenter", "Attempting return: id=${equipment.id} uid=$currentUid name=$borrowerName")
+        // Spec §4.5 — disable live-dependent actions when offline
+        if (!NetworkMonitor.isOnline(context)) {
+            view?.showToast(context.getString(com.example.eldroid_nullpoint.R.string.error_offline_action))
+            return
+        }
+
+        setSubmitting(true)
+        Log.d(TAG, "Return attempt: id=${equipment.id} uid=$currentUid name=$borrowerName")
 
         SmartDockRepository.returnItem(equipment.id, currentUid, borrowerName)
             .addOnSuccessListener { returned ->
-                android.util.Log.d("DetailPresenter", "Return SUCCESS: ${returned.name}")
-                com.example.eldroid_nullpoint.util.DebugBroadcaster.broadcast("✅ Return SUCCESS: ${returned.name}")
+                Log.d(TAG, "Return success: ${returned.name}")
                 setSubmitting(false)
-                view?.showToast("${returned.name} returned to Box ${returned.boxNumber}")
+                view?.showToast(
+                    context.getString(com.example.eldroid_nullpoint.R.string.return_success,
+                        returned.name, returned.boxNumber)
+                )
             }
             .addOnFailureListener { error ->
-                android.util.Log.e("DetailPresenter", "Return FAILURE", error)
-                val errorMsg = resolveActionError(error)
-                com.example.eldroid_nullpoint.util.DebugBroadcaster.broadcast("❌ Return FAILED: $errorMsg")
+                Log.e(TAG, "Return failed", error)
                 setSubmitting(false)
-                view?.showToast(errorMsg)
+                view?.showToast(resolveActionError(error))
             }
-            
-        com.example.eldroid_nullpoint.util.DebugBroadcaster.broadcast("⏳ Waiting for Firebase response...")
     }
 
     fun loadBorrowerName() {
@@ -165,6 +143,8 @@ class EquipmentDetailPresenter(
 
     private fun renderActions(equipment: Equipment) {
         if (isSubmitting) return
+
+        // Spec §5.1, §16.6 — items in maintenance/fault/lost/etc. are not borrowable
         val canBorrow = !DemoData.isDemoId(equipment.id) &&
                 LoanPolicy.canBorrow(equipment, currentUid) == LoanPolicy.BorrowCheck.OK
         val canReturn = !DemoData.isDemoId(equipment.id) &&
@@ -181,25 +161,38 @@ class EquipmentDetailPresenter(
         currentEquipment?.let { if (!submitting) renderActions(it) }
     }
 
+    /**
+     * Maps every known failure mode to a user-friendly string.
+     * Spec §15.2 — never expose raw internal error details to the borrower.
+     */
     private fun resolveActionError(error: Throwable): String {
         val loanError = SmartDockRepository.loanExceptionOf(error)
-        // Log full error so Logcat shows the exact cause
-        android.util.Log.e("DetailPresenter", "Action error: ${error.javaClass.simpleName}: ${error.message}", error)
+        Log.e(TAG, "Action error: ${error.javaClass.simpleName}: ${error.message}", error)
 
-        return when {
-            loanError?.borrowCheck == LoanPolicy.BorrowCheck.ALREADY_BORROWED ->
-                "Already borrowed"
-            loanError?.borrowCheck == LoanPolicy.BorrowCheck.NOT_FOUND ||
-                    loanError?.returnCheck == LoanPolicy.ReturnCheck.NOT_FOUND ->
-                "Equipment not found"
-            loanError?.returnCheck == LoanPolicy.ReturnCheck.NOT_YOURS ->
-                "Not your item"
-            loanError?.returnCheck == LoanPolicy.ReturnCheck.NOT_BORROWED ->
-                "Not currently borrowed"
-            SmartDockRepository.isPermissionDenied(error) ->
-                "PERMISSION_DENIED — Firestore rules blocked this write. Check rules."
-            else -> "FAILED: ${error.javaClass.simpleName}: ${error.message}"
-        }
+        return context.getString(
+            when {
+                loanError?.borrowCheck == LoanPolicy.BorrowCheck.ALREADY_BORROWED ->
+                    com.example.eldroid_nullpoint.R.string.error_already_borrowed
+                loanError?.borrowCheck == LoanPolicy.BorrowCheck.UNAVAILABLE ->
+                    com.example.eldroid_nullpoint.R.string.error_contact_admin
+                loanError?.returnCheck == LoanPolicy.ReturnCheck.NOT_YOURS ->
+                    com.example.eldroid_nullpoint.R.string.error_not_your_item
+                loanError?.returnCheck == LoanPolicy.ReturnCheck.NOT_BORROWED ->
+                    com.example.eldroid_nullpoint.R.string.error_not_borrowed
+                SmartDockRepository.isPermissionDenied(error) ->
+                    com.example.eldroid_nullpoint.R.string.error_permission_denied
+                isOfflineError(error) ->
+                    com.example.eldroid_nullpoint.R.string.error_offline_action
+                else ->
+                    com.example.eldroid_nullpoint.R.string.error_action_failed
+            }
+        )
+    }
+
+    private fun isOfflineError(error: Throwable): Boolean {
+        val code = (error as? FirebaseFirestoreException)?.code
+        return code == FirebaseFirestoreException.Code.UNAVAILABLE ||
+                code == FirebaseFirestoreException.Code.DEADLINE_EXCEEDED
     }
 
     override fun detach() {

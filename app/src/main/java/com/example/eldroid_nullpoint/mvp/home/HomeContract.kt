@@ -20,6 +20,8 @@ interface HomeContract {
         fun showToast(message: String)
         fun showSeedConfirmDialog()
         fun navigateToLogin()
+        /** Show or hide the offline banner. Spec §4.5 */
+        fun showOfflineBanner(offline: Boolean)
     }
 
     interface Presenter {
