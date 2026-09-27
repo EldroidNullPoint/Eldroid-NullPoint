@@ -26,7 +26,8 @@ object SmartDockRepository {
     data class BorrowReceipt(
         val equipment: Equipment,
         val borrowedAt: Long,
-        val dueAt: Long
+        val dueAt: Long,
+        val purpose: String = ""
     )
 
     private val firestore: FirebaseFirestore get() = FirebaseFirestore.getInstance()
@@ -35,7 +36,7 @@ object SmartDockRepository {
     // Borrow
     // ---------------------------------------------------------------
 
-    fun borrow(equipmentId: String, uid: String, userName: String): Task<BorrowReceipt> {
+    fun borrow(equipmentId: String, uid: String, userName: String, purpose: String = ""): Task<BorrowReceipt> {
         val db = firestore
         val equipmentRef = db.collection(Equipment.COLLECTION).document(equipmentId)
 
@@ -55,10 +56,10 @@ object SmartDockRepository {
             // 1. Update equipment status
             tx.update(equipmentRef, LoanPolicy.borrowUpdate(uid, userName, now))
 
-            // 2. Append transaction log
+            // 2. Append transaction log — includes borrower purpose
             tx.set(
                 db.collection(Transaction.COLLECTION).document(),
-                LoanPolicy.transactionDoc(current, uid, userName, Transaction.TYPE_BORROW, now)
+                LoanPolicy.transactionDoc(current, uid, userName, Transaction.TYPE_BORROW, now, purpose)
             )
 
             // 3. Write borrow confirmation notification
@@ -70,7 +71,7 @@ object SmartDockRepository {
                 notification.toMap()
             )
 
-            BorrowReceipt(current, now, dueAt)
+            BorrowReceipt(current, now, dueAt, purpose)
         }.addOnSuccessListener {
             Log.d(TAG, "borrow success: equipmentId=$equipmentId")
         }.addOnFailureListener { e ->

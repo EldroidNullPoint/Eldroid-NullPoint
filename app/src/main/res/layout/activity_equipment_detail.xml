@@ -212,7 +212,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="48dp"
                 android:layout_marginTop="10dp"
-                android:background="@drawable/bg_card_muted"
+                android:background="@drawable/bg_button_outline_green"
                 android:elevation="0dp"
                 android:text="@string/btn_request_extension"
                 android:textAllCaps="false"

@@ -64,7 +64,8 @@ object LoanPolicy {
         uid: String,
         userName: String,
         type: String,
-        now: Long
+        now: Long,
+        purpose: String = ""
     ): Map<String, Any> {
         val due = if (type == Transaction.TYPE_BORROW) dueAtFor(now) else 0L
         return mapOf(
@@ -77,7 +78,8 @@ object LoanPolicy {
             "timestamp"      to now,
             "originalDueAt"  to due,
             "currentDueAt"   to due,
-            "extensionCount" to 0
+            "extensionCount" to 0,
+            "purpose"        to purpose
         )
     }
 

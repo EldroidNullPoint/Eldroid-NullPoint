@@ -107,6 +107,46 @@
     <string name="error_extension_already_pending">You already have a pending extension request for this item.</string>
     <string name="time_remaining">Time remaining: %1$s</string>
 
+    <!-- Terms and Conditions -->
+    <string name="title_terms">SmartDock Borrower Terms</string>
+    <string name="terms_effective_date">Effective from the date of account registration.</string>
+    <string name="terms_agree_label">I have read and agree to the SmartDock Borrower Terms and Conditions.</string>
+    <string name="btn_accept_terms">Accept and Continue</string>
+    <string name="btn_decline_terms">Decline</string>
+    <string name="btn_view_terms">View Terms &amp; Conditions</string>
+    <string name="terms_decline_message">You must accept the terms and conditions to create a SmartDock borrower account.</string>
+    <string name="error_terms_not_accepted">Please read and accept the terms and conditions to continue.</string>
+
+    <string name="terms_section_purpose_title">1. Purpose</string>
+    <string name="terms_section_purpose_body">SmartDock is an RFID-based equipment borrowing system operated by the equipment room. This application allows registered borrowers to monitor equipment availability, track their active loans, receive due-date reminders, and request loan extensions. Physical borrowing and returning is performed at the SmartDock tower using your registered RFID card.</string>
+
+    <string name="terms_section_eligibility_title">2. Eligibility</string>
+    <string name="terms_section_eligibility_body">You must be a currently enrolled student or authorized personnel to register for a SmartDock account. Creating an account does not automatically grant borrowing privileges. Your account must be reviewed and approved by an administrator. An RFID card must be issued and linked to your account before you can borrow equipment at the tower.</string>
+
+    <string name="terms_section_account_title">3. Account Responsibilities</string>
+    <string name="terms_section_account_body">You are responsible for:\n\n• Providing accurate registration information.\n• Keeping your login credentials confidential.\n• Not sharing your RFID card with another person.\n• Reporting a lost or stolen RFID card to the administrator immediately.\n• Ensuring your contact information remains up to date.\n\nThe RFID card identifies you at the tower. You are accountable for all transactions recorded under your card UID.</string>
+
+    <string name="terms_section_borrowing_title">4. Borrowing Rules</string>
+    <string name="terms_section_borrowing_body">• Borrowing is permitted only during configured operating hours.\n• The default loan duration is 3 hours from the time of borrowing.\n• You may borrow one item at a time unless the administrator configures otherwise.\n• Viewing an item as \'Available\' in the app does not reserve it. Items are allocated on a first-come, first-served basis at the tower.\n• You must return the item to its assigned box. Placing an item in the wrong box does not complete a return.\n• An overdue item may restrict your ability to borrow new equipment until it is returned.</string>
+
+    <string name="terms_section_overdue_title">5. Overdue Items</string>
+    <string name="terms_section_overdue_body">If you do not return an item by its due time:\n\n• The item will be marked overdue in the system.\n• You will receive an overdue notification.\n• The administrator will be alerted.\n• Your borrowing privileges may be suspended until the item is returned.\n• Late returns are still accepted — return the item as soon as possible.\n\nIf you need more time, submit an Extension Request before your due time expires. Extension requests require administrator approval and do not automatically extend your loan.</string>
+
+    <string name="terms_section_rfid_title">6. RFID Card</string>
+    <string name="terms_section_rfid_body">Your RFID card is issued by the equipment room administrator. It is the physical authentication token that identifies you at the SmartDock tower. You must:\n\n• Keep your card safe and in good condition.\n• Not lend your card to any other person.\n• Report loss or damage immediately so the card can be deactivated and replaced.\n\nAll tower transactions using your card are your responsibility, regardless of who physically presented the card.</string>
+
+    <string name="terms_section_care_title">7. Equipment Care</string>
+    <string name="terms_section_care_body">You are responsible for the equipment from the moment you remove it from its box until it is returned and confirmed by the SmartDock sensor.\n\n• Handle all equipment with care.\n• Do not modify, disassemble, or attempt to repair any equipment.\n• Report damage to the administrator on return.\n• Lost or damaged equipment may result in replacement charges and account suspension.\n\nThe SmartDock sensor detects box occupancy but cannot verify item identity. Returning the correct item to the correct box is your responsibility.</string>
+
+    <string name="terms_section_violations_title">8. Violations and Suspension</string>
+    <string name="terms_section_violations_body">The following may result in account suspension or termination:\n\n• Removing equipment without a valid RFID session.\n• Failing to return overdue equipment after administrator contact.\n• Sharing your RFID card.\n• Attempting to interfere with the SmartDock hardware or software.\n• Providing false information during registration.\n• Repeated late returns.\n\nAdministrators may suspend borrowing privileges, require an in-person meeting, or escalate to institutional disciplinary processes where appropriate.</string>
+
+    <string name="terms_section_privacy_title">9. Data and Privacy</string>
+    <string name="terms_section_privacy_body">SmartDock records your borrowing activity to manage equipment accountability. This includes your name, email, RFID card reference, borrow times, due times, and return times.\n\nThis data is:\n• Visible to authorized equipment room administrators.\n• Used only for equipment management and accountability.\n• Not shared with external parties outside the institution.\n\nYour borrowing history remains attached to your account for the duration of your registration and institutional record-keeping period.</string>
+
+    <string name="terms_section_amendments_title">10. Changes to These Terms</string>
+    <string name="terms_section_amendments_body">The equipment room administrator may update these terms to reflect changes in operating policy, equipment availability, or institutional requirements. You will be notified of significant changes through the app. Continued use of SmartDock after notification of changes constitutes acceptance of the updated terms.\n\nFor questions about these terms, contact the equipment room administrator directly.</string>
+
     <!-- Dashboard -->
     <string name="greeting_morning">Good morning</string>
     <string name="greeting_afternoon">Good afternoon</string>
@@ -146,8 +186,8 @@
     <string name="detail_holder">Currently with</string>
     <string name="detail_holder_you">You</string>
     <string name="detail_holder_other">Another borrower</string>
-    <string name="detail_hint_borrow">This item is in its box. Tap Borrow below (or your RFID card on the tower), then take it from Box %1$d.</string>
-    <string name="detail_hint_return">Place this item back in Box %1$d and tap Return below (or tap your RFID card on the tower).</string>
+    <string name="detail_hint_borrow">This item is in its box. Tap Borrow (or use your RFID card at the tower) then take it from Box %1$d. You have 3 hours to return it.</string>
+    <string name="detail_hint_return">Place this item back in Box %1$d and tap Return (or use your RFID card at the tower). Need more time? Tap Request Extension below before your due time expires.</string>
     <string name="detail_hint_unavailable">This item is currently borrowed. It will show as available here as soon as it is returned to Box %1$d.</string>
     <string name="detail_hint_overdue">This item is overdue. Please return it to Box %1$d as soon as possible - overdue items are escalated to the administrator.</string>
     <string name="detail_not_found">This equipment is no longer registered on the SmartDock tower.</string>
@@ -168,11 +208,22 @@
     <string name="activity_overdue">%1$s is overdue</string>
     <string name="activity_alert">Alert for %1$s</string>
 
+    <!-- Borrow purpose bottom sheet -->
+    <string name="sheet_borrow_title">Borrow Equipment</string>
+    <string name="sheet_borrow_box_due">Box %1$d  ·  Due back in 3 hours</string>
+    <string name="sheet_borrow_policy_heading">Borrowing rules</string>
+    <string name="sheet_borrow_policy_body">• Maximum loan time is 3 hours.\n• Return to the correct box on time.\n• If you need more time, submit an Extension Request before your due time — extensions require administrator approval.\n• Overdue items restrict your borrowing until returned.</string>
+    <string name="label_purpose">Purpose</string>
+    <string name="label_purpose_required">What is this for? *</string>
+    <string name="hint_purpose">e.g. Class presentation, lab activity, recording session…</string>
+    <string name="error_purpose_required">Please state what you are borrowing this for.</string>
+    <string name="btn_confirm_borrow">Confirm Borrow</string>
+
     <!-- Borrow / return actions (in-app stand-in for the tower) -->
     <string name="btn_borrow">Borrow</string>
     <string name="btn_return">Return</string>
     <string name="borrow_confirm_title">Borrow %1$s?</string>
-    <string name="borrow_confirm_message">It will be recorded under your name from Box %1$d and is due back in 24 hours.</string>
+    <string name="borrow_confirm_message">It will be recorded under your name from Box %1$d. You have 3 hours to return it.</string>
     <string name="return_confirm_title">Return %1$s?</string>
     <string name="return_confirm_message">Confirm that the item is back in Box %1$d.</string>
     <string name="btn_confirm">Confirm</string>
@@ -183,6 +234,7 @@
     <string name="error_not_borrowed">This item is already in its box.</string>
     <string name="error_permission_denied">Firestore refused the change. Ask the administrator to deploy the app\'s security rules.</string>
     <string name="error_action_failed">Something went wrong. Check your connection and try again.</string>
+    <string name="title_action_failed">Action Failed</string>
     <string name="action_stand_in_note">While the SmartDock tower is being built, the app records borrows and returns directly.</string>
 
     <!-- Borrow confirmation screen (FR-05) -->
@@ -192,7 +244,7 @@
     <string name="label_box_location">Box location</string>
     <string name="label_borrowed_time">Borrowed at</string>
     <string name="label_due_time">Return by</string>
-    <string name="borrow_confirmation_reminder">We\'ll remind you an hour before it\'s due and again if it becomes overdue.</string>
+    <string name="borrow_confirmation_reminder">We\'ll remind you 30 minutes before it\'s due and again when it becomes overdue. Need more time? Request an extension before your due time.</string>
     <string name="btn_back_to_dashboard">Back to dashboard</string>
     <string name="btn_view_item">View item</string>
 

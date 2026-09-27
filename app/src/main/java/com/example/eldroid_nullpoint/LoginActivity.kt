@@ -155,6 +155,13 @@ class LoginActivity : AppCompatActivity(), LoginContract.View {
         finish()
     }
 
+    override fun navigateToTerms() {
+        val intent = Intent(this, TermsActivity::class.java)
+        intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
+        startActivity(intent)
+        finish()
+    }
+
     override fun showToast(message: String) {
         Toast.makeText(this, message, Toast.LENGTH_LONG).show()
     }

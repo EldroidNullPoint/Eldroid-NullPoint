@@ -69,7 +69,7 @@ class EquipmentDetailPresenter(
         // The listener is only cleaned up in detach() when the screen fully closes.
     }
 
-    override fun onBorrowConfirmed() {
+    override fun onBorrowConfirmed(purpose: String) {
         val equipment = currentEquipment ?: return
         if (isSubmitting) return
 
@@ -80,9 +80,9 @@ class EquipmentDetailPresenter(
         }
 
         setSubmitting(true)
-        Log.d(TAG, "Borrow attempt: id=${equipment.id} uid=$currentUid name=$borrowerName")
+        Log.d(TAG, "Borrow attempt: id=${equipment.id} uid=$currentUid name=$borrowerName purpose=$purpose")
 
-        SmartDockRepository.borrow(equipment.id, currentUid, borrowerName)
+        SmartDockRepository.borrow(equipment.id, currentUid, borrowerName, purpose)
             .addOnSuccessListener { receipt ->
                 Log.d(TAG, "Borrow success: ${receipt.equipment.name}")
                 setSubmitting(false)
@@ -92,7 +92,9 @@ class EquipmentDetailPresenter(
             .addOnFailureListener { error ->
                 Log.e(TAG, "Borrow failed", error)
                 setSubmitting(false)
-                view?.showToast(resolveActionError(error))
+                val msg = resolveActionError(error)
+                // Use a dialog so the error is impossible to miss
+                view?.showErrorDialog(msg)
             }
     }
 
@@ -113,6 +115,7 @@ class EquipmentDetailPresenter(
             .addOnSuccessListener { returned ->
                 Log.d(TAG, "Return success: ${returned.name}")
                 setSubmitting(false)
+                // Toast for success — brief and non-blocking is fine here
                 view?.showToast(
                     context.getString(com.example.eldroid_nullpoint.R.string.return_success,
                         returned.name, returned.boxNumber)
@@ -121,7 +124,8 @@ class EquipmentDetailPresenter(
             .addOnFailureListener { error ->
                 Log.e(TAG, "Return failed", error)
                 setSubmitting(false)
-                view?.showToast(resolveActionError(error))
+                // Dialog for failure so the user never misses it
+                view?.showErrorDialog(resolveActionError(error))
             }
     }
 

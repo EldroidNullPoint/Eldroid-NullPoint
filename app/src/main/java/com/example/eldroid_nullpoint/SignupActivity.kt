@@ -28,6 +28,9 @@ class SignupActivity : AppCompatActivity(), SignupContract.View {
     private var isPasswordVisible = false
     private var isConfirmPasswordVisible = false
 
+    /** True once the user accepts the Terms & Conditions. */
+    private var termsAccepted = false
+
     private val googleSignInLauncher =
         registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
             val task = GoogleSignIn.getSignedInAccountFromIntent(result.data)
@@ -45,13 +48,25 @@ class SignupActivity : AppCompatActivity(), SignupContract.View {
             }
         }
 
+    /**
+     * Opens the Terms screen for explicit agreement.
+     * On RESULT_OK the user accepted — proceed with signup.
+     * On RESULT_CANCELED the user declined — stay on signup, do nothing.
+     */
+    private val termsLauncher =
+        registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
+            if (result.resultCode == RESULT_OK) {
+                termsAccepted = true
+                proceedWithSignup()
+            }
+        }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = ActivitySignupBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
         presenter = SignupPresenter(this)
-
         setupGoogleSignIn()
         setupListeners()
     }
@@ -60,6 +75,10 @@ class SignupActivity : AppCompatActivity(), SignupContract.View {
         super.onDestroy()
         presenter.detach()
     }
+
+    // ---------------------------------------------------------------
+    // Setup
+    // ---------------------------------------------------------------
 
     private fun setupGoogleSignIn() {
         val gso = GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
@@ -74,11 +93,9 @@ class SignupActivity : AppCompatActivity(), SignupContract.View {
 
         binding.ivTogglePassword.setOnClickListener {
             isPasswordVisible = !isPasswordVisible
-            binding.etPassword.transformationMethod = if (isPasswordVisible) {
+            binding.etPassword.transformationMethod = if (isPasswordVisible)
                 HideReturnsTransformationMethod.getInstance()
-            } else {
-                PasswordTransformationMethod.getInstance()
-            }
+            else PasswordTransformationMethod.getInstance()
             binding.etPassword.setSelection(binding.etPassword.text.length)
             binding.ivTogglePassword.setImageResource(
                 if (isPasswordVisible) R.drawable.ic_eye_off else R.drawable.ic_eye
@@ -87,39 +104,102 @@ class SignupActivity : AppCompatActivity(), SignupContract.View {
 
         binding.ivToggleConfirmPassword.setOnClickListener {
             isConfirmPasswordVisible = !isConfirmPasswordVisible
-            binding.etConfirmPassword.transformationMethod = if (isConfirmPasswordVisible) {
+            binding.etConfirmPassword.transformationMethod = if (isConfirmPasswordVisible)
                 HideReturnsTransformationMethod.getInstance()
-            } else {
-                PasswordTransformationMethod.getInstance()
-            }
+            else PasswordTransformationMethod.getInstance()
             binding.etConfirmPassword.setSelection(binding.etConfirmPassword.text.length)
             binding.ivToggleConfirmPassword.setImageResource(
                 if (isConfirmPasswordVisible) R.drawable.ic_eye_off else R.drawable.ic_eye
             )
         }
 
+        // Signup: validate fields first, then show Terms if not yet accepted
         binding.btnSignup.setOnClickListener {
-            presenter.onSignupClicked(
-                firstName = trimInPlace(binding.etFirstName),
-                lastName = trimInPlace(binding.etLastName),
-                email = trimInPlace(binding.etEmail),
-                password = binding.etPassword.text.toString(),
-                confirmPassword = binding.etConfirmPassword.text.toString()
-            )
+            if (validateFields()) {
+                if (termsAccepted) proceedWithSignup()
+                else termsLauncher.launch(TermsActivity.intentAgreement(this))
+            }
         }
 
+        // Google signup: terms first
         binding.btnGoogleSignup.setOnClickListener {
-            showLoading(true)
-            googleSignInLauncher.launch(googleSignInClient.signInIntent)
+            if (!termsAccepted) {
+                termsLauncher.launch(TermsActivity.intentAgreement(this))
+            } else {
+                showLoading(true)
+                googleSignInLauncher.launch(googleSignInClient.signInIntent)
+            }
+        }
+
+        // "View terms" link below the signup button
+        binding.tvViewTerms.setOnClickListener {
+            startActivity(TermsActivity.intentReadOnly(this))
         }
 
         binding.tvGoToLogin.setOnClickListener { finish() }
 
-        clearErrorOnEdit(binding.etFirstName, binding.tvFirstNameError)
-        clearErrorOnEdit(binding.etLastName, binding.tvLastNameError)
-        clearErrorOnEdit(binding.etEmail, binding.tvEmailError)
-        clearErrorOnEdit(binding.etPassword, binding.tvPasswordError)
+        clearErrorOnEdit(binding.etFirstName,       binding.tvFirstNameError)
+        clearErrorOnEdit(binding.etLastName,        binding.tvLastNameError)
+        clearErrorOnEdit(binding.etEmail,           binding.tvEmailError)
+        clearErrorOnEdit(binding.etPassword,        binding.tvPasswordError)
         clearErrorOnEdit(binding.etConfirmPassword, binding.tvConfirmPasswordError)
+    }
+
+    // ---------------------------------------------------------------
+    // Validation & submission
+    // ---------------------------------------------------------------
+
+    private fun validateFields(): Boolean {
+        clearErrors()
+        var valid = true
+
+        if (trimInPlace(binding.etFirstName).isBlank()) {
+            binding.tvFirstNameError.text = getString(R.string.error_first_name_required)
+            binding.tvFirstNameError.visibility = View.VISIBLE
+            valid = false
+        }
+        if (trimInPlace(binding.etLastName).isBlank()) {
+            binding.tvLastNameError.text = getString(R.string.error_last_name_required)
+            binding.tvLastNameError.visibility = View.VISIBLE
+            valid = false
+        }
+        val email = trimInPlace(binding.etEmail)
+        if (email.isBlank()) {
+            binding.tvEmailError.text = getString(R.string.error_email_required)
+            binding.tvEmailError.visibility = View.VISIBLE
+            valid = false
+        } else if (!android.util.Patterns.EMAIL_ADDRESS.matcher(email).matches()) {
+            binding.tvEmailError.text = getString(R.string.error_invalid_email)
+            binding.tvEmailError.visibility = View.VISIBLE
+            valid = false
+        }
+        val password = binding.etPassword.text.toString()
+        if (password.isBlank()) {
+            binding.tvPasswordError.text = getString(R.string.error_password_required)
+            binding.tvPasswordError.visibility = View.VISIBLE
+            valid = false
+        }
+        val confirm = binding.etConfirmPassword.text.toString()
+        if (confirm.isBlank()) {
+            binding.tvConfirmPasswordError.text = getString(R.string.error_confirm_password_required)
+            binding.tvConfirmPasswordError.visibility = View.VISIBLE
+            valid = false
+        } else if (password != confirm) {
+            binding.tvConfirmPasswordError.text = getString(R.string.error_passwords_dont_match)
+            binding.tvConfirmPasswordError.visibility = View.VISIBLE
+            valid = false
+        }
+        return valid
+    }
+
+    private fun proceedWithSignup() {
+        presenter.onSignupClicked(
+            firstName       = trimInPlace(binding.etFirstName),
+            lastName        = trimInPlace(binding.etLastName),
+            email           = trimInPlace(binding.etEmail),
+            password        = binding.etPassword.text.toString(),
+            confirmPassword = binding.etConfirmPassword.text.toString()
+        )
     }
 
     private fun clearErrorOnEdit(field: EditText, errorView: TextView) {
@@ -127,7 +207,7 @@ class SignupActivity : AppCompatActivity(), SignupContract.View {
     }
 
     private fun trimInPlace(field: EditText): String {
-        val raw = field.text.toString()
+        val raw     = field.text.toString()
         val trimmed = raw.trim()
         if (raw != trimmed) {
             field.setText(trimmed)
@@ -142,8 +222,8 @@ class SignupActivity : AppCompatActivity(), SignupContract.View {
 
     override fun showLoading(loading: Boolean) {
         binding.progressBar.visibility = if (loading) View.VISIBLE else View.GONE
-        binding.btnSignup.isEnabled = !loading
-        binding.btnSignup.text = if (loading) "" else getString(R.string.btn_signup)
+        binding.btnSignup.isEnabled    = !loading
+        binding.btnSignup.text         = if (loading) "" else getString(R.string.btn_signup)
         binding.btnGoogleSignup.isEnabled = !loading
     }
 
@@ -173,10 +253,10 @@ class SignupActivity : AppCompatActivity(), SignupContract.View {
     }
 
     override fun clearErrors() {
-        binding.tvFirstNameError.visibility = View.GONE
-        binding.tvLastNameError.visibility = View.GONE
-        binding.tvEmailError.visibility = View.GONE
-        binding.tvPasswordError.visibility = View.GONE
+        binding.tvFirstNameError.visibility      = View.GONE
+        binding.tvLastNameError.visibility       = View.GONE
+        binding.tvEmailError.visibility          = View.GONE
+        binding.tvPasswordError.visibility       = View.GONE
         binding.tvConfirmPasswordError.visibility = View.GONE
     }
 

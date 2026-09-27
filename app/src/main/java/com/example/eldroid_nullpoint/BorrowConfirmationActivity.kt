@@ -24,6 +24,7 @@ class BorrowConfirmationActivity : AppCompatActivity() {
         private const val EXTRA_BORROWED_AT = "extra_borrowed_at"
         private const val EXTRA_DUE_AT = "extra_due_at"
         private const val EXTRA_IMAGE_DATA = "extra_image_data"
+        private const val EXTRA_PURPOSE = "extra_purpose"
 
         fun intent(context: Context, receipt: SmartDockRepository.BorrowReceipt): Intent =
             Intent(context, BorrowConfirmationActivity::class.java)
@@ -34,6 +35,7 @@ class BorrowConfirmationActivity : AppCompatActivity() {
                 .putExtra(EXTRA_BORROWED_AT, receipt.borrowedAt)
                 .putExtra(EXTRA_DUE_AT, receipt.dueAt)
                 .putExtra(EXTRA_IMAGE_DATA, receipt.equipment.imageData)
+                .putExtra(EXTRA_PURPOSE, receipt.purpose)
     }
 
     private lateinit var binding: ActivityBorrowConfirmationBinding
@@ -50,12 +52,21 @@ class BorrowConfirmationActivity : AppCompatActivity() {
         val borrowedAt = intent.getLongExtra(EXTRA_BORROWED_AT, 0L)
         val dueAt = intent.getLongExtra(EXTRA_DUE_AT, 0L)
         val imageData = intent.getStringExtra(EXTRA_IMAGE_DATA).orEmpty()
+        val purpose = intent.getStringExtra(EXTRA_PURPOSE).orEmpty()
 
         EquipmentImages.bindInto(binding.ivPhoto, name, category, imageData, fallbackPaddingDp = 40)
         binding.tvItemName.text = name.ifBlank { getString(R.string.label_item) }
         binding.tvBox.text = getString(R.string.box_label, boxNumber)
         binding.tvBorrowedAt.text = TimeFormat.dateTime(borrowedAt)
         binding.tvDueAt.text = TimeFormat.dateTime(dueAt)
+
+        // Show borrower's stated purpose
+        if (purpose.isNotBlank()) {
+            binding.rowPurpose.visibility = android.view.View.VISIBLE
+            binding.tvPurpose.text = purpose
+        } else {
+            binding.rowPurpose.visibility = android.view.View.GONE
+        }
 
         binding.btnBackToDashboard.setOnClickListener { goHome() }
 

@@ -14,7 +14,10 @@ import com.example.eldroid_nullpoint.mvp.equipmentdetail.EquipmentDetailPresente
 import com.example.eldroid_nullpoint.util.EquipmentImages
 import com.example.eldroid_nullpoint.util.SmartDockRepository
 import com.example.eldroid_nullpoint.util.TimeFormat
+import com.google.android.material.bottomsheet.BottomSheetDialog
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
+import com.google.android.material.textfield.TextInputEditText
+import com.google.android.material.textfield.TextInputLayout
 import com.google.firebase.auth.FirebaseAuth
 
 class EquipmentDetailActivity : AppCompatActivity(), EquipmentDetailContract.View {
@@ -80,14 +83,42 @@ class EquipmentDetailActivity : AppCompatActivity(), EquipmentDetailContract.Vie
     // Confirm dialogs
     // ---------------------------------------------------------------
 
+    /**
+     * Borrow: show a bottom sheet that collects the borrower's stated purpose
+     * before committing. Spec §11 — borrower should know the 3-hour limit,
+     * and the purpose is stored with the transaction so the admin can see it.
+     */
     private fun confirmBorrow() {
         val equipment = currentEquipment ?: return
-        MaterialAlertDialogBuilder(this)
-            .setTitle(getString(R.string.borrow_confirm_title, equipment.name))
-            .setMessage(getString(R.string.borrow_confirm_message, equipment.boxNumber))
-            .setNegativeButton(R.string.btn_cancel, null)
-            .setPositiveButton(R.string.btn_confirm) { _, _ -> presenter.onBorrowConfirmed() }
-            .show()
+
+        val sheet = BottomSheetDialog(this)
+        val sheetView = layoutInflater.inflate(R.layout.sheet_borrow_purpose, null)
+        sheet.setContentView(sheetView)
+
+        val tvEquipmentName = sheetView.findViewById<android.widget.TextView>(R.id.tvSheetEquipmentName)
+        val tvBoxDue        = sheetView.findViewById<android.widget.TextView>(R.id.tvSheetBoxDue)
+        val tilPurpose      = sheetView.findViewById<TextInputLayout>(R.id.tilPurpose)
+        val etPurpose       = sheetView.findViewById<TextInputEditText>(R.id.etPurpose)
+        val btnConfirm      = sheetView.findViewById<android.widget.Button>(R.id.btnSheetConfirm)
+        val btnCancel       = sheetView.findViewById<android.widget.Button>(R.id.btnSheetCancel)
+
+        tvEquipmentName.text = equipment.name
+        tvBoxDue.text = getString(R.string.sheet_borrow_box_due, equipment.boxNumber)
+
+        btnCancel.setOnClickListener { sheet.dismiss() }
+
+        btnConfirm.setOnClickListener {
+            val purpose = etPurpose.text?.toString()?.trim().orEmpty()
+            if (purpose.isBlank()) {
+                tilPurpose.error = getString(R.string.error_purpose_required)
+                return@setOnClickListener
+            }
+            tilPurpose.error = null
+            sheet.dismiss()
+            presenter.onBorrowConfirmed(purpose)
+        }
+
+        sheet.show()
     }
 
     private fun confirmReturn() {
@@ -230,9 +261,9 @@ class EquipmentDetailActivity : AppCompatActivity(), EquipmentDetailContract.Vie
 
     override fun showErrorDialog(message: String) {
         MaterialAlertDialogBuilder(this)
-            .setTitle(R.string.error_action_failed)
+            .setTitle(R.string.title_action_failed)
             .setMessage(message)
-            .setPositiveButton(R.string.btn_cancel, null)
+            .setPositiveButton(android.R.string.ok, null)
             .show()
     }
 

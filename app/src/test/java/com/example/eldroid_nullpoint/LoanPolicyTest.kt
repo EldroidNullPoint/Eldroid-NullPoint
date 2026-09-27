@@ -27,15 +27,15 @@ class LoanPolicyTest {
         status = Equipment.STATUS_BORROWED,
         borrowedBy = me,
         borrowedByName = "Me",
-        borrowedAt = now - TimeUnit.HOURS.toMillis(2),
-        dueAt = now + TimeUnit.HOURS.toMillis(22)
+        borrowedAt = now - TimeUnit.HOURS.toMillis(1),
+        dueAt = now + TimeUnit.HOURS.toMillis(2)   // 1 hour in, 2 hours remaining → 3-hour loan
     )
     private val theirs = mine.copy(borrowedBy = other, borrowedByName = "Someone")
 
     @Test
-    fun `loans are due exactly 24 hours after they start`() {
-        assertEquals(TimeUnit.HOURS.toMillis(24), LoanPolicy.LOAN_DURATION_MS)
-        assertEquals(now + TimeUnit.HOURS.toMillis(24), LoanPolicy.dueAtFor(now))
+    fun `loans are due exactly 3 hours after they start`() {
+        assertEquals(TimeUnit.HOURS.toMillis(3), LoanPolicy.LOAN_DURATION_MS)
+        assertEquals(now + TimeUnit.HOURS.toMillis(3), LoanPolicy.dueAtFor(now))
     }
 
     @Test

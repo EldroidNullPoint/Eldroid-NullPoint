@@ -107,7 +107,7 @@ Category, SmartDock box, Currently with (You / Another borrower), and — for yo
 own loans — Borrowed at and Due at.
 
 - **Borrow** button appears when the item is *Available*. Tapping it asks for
-  confirmation, then records the loan (due in **24 hours**) and opens the
+  confirmation, then records the loan (due in **3 hours**) and opens the
   **Borrowing Confirmed** screen.
 - **Return** button appears when *you* currently hold the item. Confirm → the box
   becomes available again and a toast confirms the return.

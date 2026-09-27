@@ -62,6 +62,10 @@ class ProfileActivity : AppCompatActivity(), ProfileContract.View {
             startActivity(Intent(this, ChangePasswordActivity::class.java))
         }
 
+        binding.rowViewTerms.setOnClickListener {
+            startActivity(TermsActivity.intentReadOnly(this))
+        }
+
         binding.rowLogout.setOnClickListener { confirmLogout() }
 
         binding.switchReminders.isChecked = NotificationPrefs.isEnabled(this)

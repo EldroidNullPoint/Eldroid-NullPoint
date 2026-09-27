@@ -8,6 +8,7 @@ interface LoginContract {
         fun showPasswordError(message: String)
         fun clearErrors()
         fun navigateToHome()
+        fun navigateToTerms()
         fun showToast(message: String)
     }
 

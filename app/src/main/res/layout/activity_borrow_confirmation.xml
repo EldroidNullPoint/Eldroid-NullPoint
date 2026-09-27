@@ -141,6 +141,24 @@
                     android:textColor="@color/brand_green"
                     tools:text="Sep 16, 9:12 AM" />
             </LinearLayout>
+
+            <!-- Borrower's stated purpose — hidden when empty -->
+            <LinearLayout
+                android:id="@+id/rowPurpose"
+                style="@style/DetailRow"
+                android:visibility="gone"
+                tools:visibility="visible">
+
+                <TextView
+                    style="@style/DetailRowLabel"
+                    android:text="@string/label_purpose" />
+
+                <TextView
+                    android:id="@+id/tvPurpose"
+                    style="@style/DetailRowValue"
+                    android:textStyle="italic"
+                    tools:text="Class presentation" />
+            </LinearLayout>
         </LinearLayout>
 
         <TextView

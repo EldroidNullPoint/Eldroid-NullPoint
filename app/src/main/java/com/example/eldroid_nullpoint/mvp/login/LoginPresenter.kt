@@ -38,8 +38,7 @@ class LoginPresenter(
         auth.signInWithEmailAndPassword(trimmedEmail, password)
             .addOnCompleteListener { task ->
                 if (task.isSuccessful) {
-                    view?.showLoading(false)
-                    view?.navigateToHome()
+                    checkTermsAcceptance()
                 } else {
                     view?.showLoading(false)
                     view?.showPasswordError(resolveSignInError(task.exception))
@@ -83,7 +82,6 @@ class LoginPresenter(
         val docRef = firestore.collection("users").document(uid)
         docRef.get()
             .addOnSuccessListener { snapshot ->
-                view?.showLoading(false)
                 if (!snapshot.exists()) {
                     val user = User(
                         uid = uid,
@@ -93,13 +91,47 @@ class LoginPresenter(
                         provider = provider
                     )
                     docRef.set(user)
+                        .addOnSuccessListener {
+                            checkTermsAcceptance()
+                        }
+                        .addOnFailureListener {
+                            view?.showLoading(false)
+                            view?.navigateToHome()
+                        }
+                } else {
+                    checkTermsAcceptance()
                 }
-                view?.navigateToHome()
             }
             .addOnFailureListener {
                 view?.showLoading(false)
                 // Auth succeeded – let the user in even if the profile write failed.
                 view?.navigateToHome()
+            }
+    }
+
+    private fun checkTermsAcceptance() {
+        val userId = auth.currentUser?.uid
+        if (userId == null) {
+            view?.showLoading(false)
+            view?.navigateToHome()
+            return
+        }
+
+        firestore.collection("users").document(userId)
+            .get()
+            .addOnSuccessListener { snapshot ->
+                view?.showLoading(false)
+                val termsAccepted = snapshot.getBoolean("termsAccepted") ?: false
+                if (termsAccepted) {
+                    view?.navigateToHome()
+                } else {
+                    view?.navigateToTerms()
+                }
+            }
+            .addOnFailureListener {
+                view?.showLoading(false)
+                // If we can't check, show terms to be safe
+                view?.navigateToTerms()
             }
     }
 

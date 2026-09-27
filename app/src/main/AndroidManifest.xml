@@ -89,6 +89,11 @@
             android:exported="false"
             android:windowSoftInputMode="adjustResize" />
 
+        <!-- SmartDock Borrower Terms and Conditions. -->
+        <activity
+            android:name=".TermsActivity"
+            android:exported="false" />
+
         <activity
             android:name=".NotificationsActivity"
             android:exported="false" />

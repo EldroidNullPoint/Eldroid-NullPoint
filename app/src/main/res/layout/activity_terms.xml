@@ -1,0 +1,184 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/white"
+    android:orientation="vertical"
+    tools:context=".TermsActivity">
+
+    <!-- Header -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="center_vertical"
+        android:orientation="horizontal"
+        android:paddingHorizontal="16dp"
+        android:paddingVertical="14dp"
+        android:elevation="4dp"
+        android:background="@color/white">
+
+        <ImageView
+            android:id="@+id/ivBack"
+            android:layout_width="38dp"
+            android:layout_height="38dp"
+            android:background="?attr/selectableItemBackgroundBorderless"
+            android:contentDescription="@string/cd_back"
+            android:padding="7dp"
+            android:src="@drawable/ic_back" />
+
+        <TextView
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="8dp"
+            android:layout_weight="1"
+            android:text="@string/title_terms"
+            android:textColor="@color/text_primary"
+            android:textSize="18sp"
+            android:textStyle="bold" />
+    </LinearLayout>
+
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:background="@color/divider" />
+
+    <!-- Scrollable content -->
+    <androidx.core.widget.NestedScrollView
+        android:id="@+id/scrollContent"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        android:paddingHorizontal="24dp"
+        android:paddingTop="20dp"
+        android:paddingBottom="16dp"
+        android:clipToPadding="false">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical">
+
+            <!-- Effective date -->
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="@string/terms_effective_date"
+                android:textColor="@color/text_secondary"
+                android:textSize="12sp"
+                android:layout_marginBottom="20dp" />
+
+            <!-- Section: Purpose -->
+            <TextView style="@style/TermsHeading" android:text="@string/terms_section_purpose_title" />
+            <TextView style="@style/TermsBody"    android:text="@string/terms_section_purpose_body" />
+
+            <!-- Section: Eligibility -->
+            <TextView style="@style/TermsHeading" android:text="@string/terms_section_eligibility_title" />
+            <TextView style="@style/TermsBody"    android:text="@string/terms_section_eligibility_body" />
+
+            <!-- Section: Account -->
+            <TextView style="@style/TermsHeading" android:text="@string/terms_section_account_title" />
+            <TextView style="@style/TermsBody"    android:text="@string/terms_section_account_body" />
+
+            <!-- Section: Borrowing Rules -->
+            <TextView style="@style/TermsHeading" android:text="@string/terms_section_borrowing_title" />
+            <TextView style="@style/TermsBody"    android:text="@string/terms_section_borrowing_body" />
+
+            <!-- Section: Overdue -->
+            <TextView style="@style/TermsHeading" android:text="@string/terms_section_overdue_title" />
+            <TextView style="@style/TermsBody"    android:text="@string/terms_section_overdue_body" />
+
+            <!-- Section: RFID -->
+            <TextView style="@style/TermsHeading" android:text="@string/terms_section_rfid_title" />
+            <TextView style="@style/TermsBody"    android:text="@string/terms_section_rfid_body" />
+
+            <!-- Section: Equipment Care -->
+            <TextView style="@style/TermsHeading" android:text="@string/terms_section_care_title" />
+            <TextView style="@style/TermsBody"    android:text="@string/terms_section_care_body" />
+
+            <!-- Section: Violations -->
+            <TextView style="@style/TermsHeading" android:text="@string/terms_section_violations_title" />
+            <TextView style="@style/TermsBody"    android:text="@string/terms_section_violations_body" />
+
+            <!-- Section: Privacy -->
+            <TextView style="@style/TermsHeading" android:text="@string/terms_section_privacy_title" />
+            <TextView style="@style/TermsBody"    android:text="@string/terms_section_privacy_body" />
+
+            <!-- Section: Amendments -->
+            <TextView style="@style/TermsHeading" android:text="@string/terms_section_amendments_title" />
+            <TextView style="@style/TermsBody"    android:text="@string/terms_section_amendments_body" />
+
+        </LinearLayout>
+    </androidx.core.widget.NestedScrollView>
+
+    <!-- Bottom action area — only shown in agreement mode -->
+    <LinearLayout
+        android:id="@+id/bottomActions"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@color/white"
+        android:elevation="8dp"
+        android:orientation="vertical"
+        android:paddingHorizontal="24dp"
+        android:paddingTop="16dp"
+        android:paddingBottom="24dp"
+        android:visibility="gone">
+
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:background="@color/divider"
+            android:layout_marginBottom="16dp" />
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center_vertical"
+            android:orientation="horizontal"
+            android:layout_marginBottom="16dp">
+
+            <CheckBox
+                android:id="@+id/cbAgree"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:buttonTint="@color/brand_dark_green" />
+
+            <TextView
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="10dp"
+                android:layout_weight="1"
+                android:text="@string/terms_agree_label"
+                android:textColor="@color/text_primary"
+                android:textSize="14sp" />
+        </LinearLayout>
+
+        <Button
+            android:id="@+id/btnAccept"
+            android:layout_width="match_parent"
+            android:layout_height="52dp"
+            android:background="@drawable/selector_button_primary"
+            android:elevation="0dp"
+            android:text="@string/btn_accept_terms"
+            android:textAllCaps="false"
+            android:textColor="@color/white"
+            android:textSize="15sp"
+            android:textStyle="bold"
+            android:enabled="false"
+            android:alpha="0.5" />
+
+        <Button
+            android:id="@+id/btnDecline"
+            android:layout_width="match_parent"
+            android:layout_height="48dp"
+            android:layout_marginTop="10dp"
+            android:background="@android:color/transparent"
+            android:elevation="0dp"
+            android:text="@string/btn_decline_terms"
+            android:textAllCaps="false"
+            android:textColor="@color/text_secondary"
+            android:textSize="14sp" />
+    </LinearLayout>
+
+</LinearLayout>

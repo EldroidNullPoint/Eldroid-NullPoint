@@ -23,7 +23,9 @@ data class Transaction(
     /** Current due time, updated if an extension was approved. Unix epoch millis. */
     val currentDueAt: Long = 0L,
     /** Number of approved extensions on this loan. */
-    val extensionCount: Int = 0
+    val extensionCount: Int = 0,
+    /** Borrower-stated purpose for borrowing this item (e.g. "class presentation"). */
+    val purpose: String = ""
 ) {
     companion object {
         const val COLLECTION = "transactions"
@@ -43,7 +45,8 @@ data class Transaction(
             timestamp     = (doc.get("timestamp") as? Number)?.toLong() ?: 0L,
             originalDueAt = (doc.get("originalDueAt") as? Number)?.toLong() ?: 0L,
             currentDueAt  = (doc.get("currentDueAt") as? Number)?.toLong() ?: 0L,
-            extensionCount = (doc.get("extensionCount") as? Number)?.toInt() ?: 0
+            extensionCount = (doc.get("extensionCount") as? Number)?.toInt() ?: 0,
+            purpose       = doc.getString("purpose").orEmpty()
         )
     }
 }

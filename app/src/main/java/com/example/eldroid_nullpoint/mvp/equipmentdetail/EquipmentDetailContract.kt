@@ -22,7 +22,7 @@ interface EquipmentDetailContract {
     interface Presenter {
         fun onStart()
         fun onStop()
-        fun onBorrowConfirmed()
+        fun onBorrowConfirmed(purpose: String)
         fun onReturnConfirmed()
         fun detach()
     }
