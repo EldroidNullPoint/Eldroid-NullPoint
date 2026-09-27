@@ -27,6 +27,21 @@
             android:paddingTop="24dp"
             android:paddingBottom="32dp">
 
+            <!-- ===== TEST BANNER — delete this after confirming new build runs ===== -->
+            <TextView
+                android:id="@+id/tvTestBanner"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:background="#FF0000"
+                android:gravity="center"
+                android:padding="12dp"
+                android:text="✅ NEW BUILD v2 IS RUNNING — DELETE ME"
+                android:textColor="#FFFFFF"
+                android:textSize="14sp"
+                android:textStyle="bold"
+                android:layout_marginBottom="16dp" />
+            <!-- ===== END TEST BANNER ===== -->
+
             <!-- ============ Header / greeting ============ -->
             <LinearLayout
                 android:layout_width="match_parent"
