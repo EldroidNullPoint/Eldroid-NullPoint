@@ -4,6 +4,7 @@ import com.example.eldroid_nullpoint.model.AppNotification
 import com.example.eldroid_nullpoint.model.Equipment
 import com.example.eldroid_nullpoint.model.Transaction
 import com.google.android.gms.tasks.Task
+import com.google.android.gms.tasks.Tasks
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.FirebaseFirestoreException
 
@@ -69,6 +70,11 @@ object SmartDockRepository {
     fun returnItem(equipmentId: String, uid: String, userName: String): Task<Equipment> {
         val db = firestore
         val equipmentRef = db.collection(Equipment.COLLECTION).document(equipmentId)
+
+        // Step 1: run the atomic transaction — update equipment + append transaction log.
+        // The notification is intentionally written AFTER the transaction commits so it
+        // never causes the transaction to fail due to a Firestore security rule conflict
+        // (a prior overdue/due-soon notification with the same base id already exists).
         return db.runTransaction { tx ->
             val snapshot = tx.get(equipmentRef)
             val current = if (snapshot.exists()) Equipment.from(snapshot) else null
@@ -78,40 +84,40 @@ object SmartDockRepository {
             }
 
             val now = System.currentTimeMillis()
-            // 1. Clear the equipment box back to available.
             tx.update(equipmentRef, LoanPolicy.returnUpdate())
-
-            // 2. Append a return entry to the transaction log.
             tx.set(
                 db.collection(Transaction.COLLECTION).document(),
                 LoanPolicy.transactionDoc(current, uid, userName, Transaction.TYPE_RETURN, now)
             )
-
-            // 3. Write the return confirmation notification OUTSIDE the transaction
-            //    (fire-and-forget after commit) to avoid a PERMISSION_DENIED if a
-            //    prior notification with the same deterministic id already exists,
-            //    since the Firestore rule only allows create (new doc) or a read-flip
-            //    update — not a full set() on an existing document.
-            current to now   // pass through to the success callback
-        }.continueWithTask { task ->
-            if (!task.isSuccessful) {
-                throw task.exception ?: Exception("Return transaction failed")
+            // Return both the equipment snapshot and the timestamp so the
+            // post-transaction notification write has what it needs.
+            android.util.Pair(current, now)
+        }.continueWithTask { txTask ->
+            if (!txTask.isSuccessful) {
+                // Re-throw so addOnFailureListener in the presenter receives it.
+                throw txTask.exception ?: Exception("Return transaction failed")
             }
-            val (equipment, now) = task.result!!
+            val pair = txTask.result!!
+            val equipment: Equipment = pair.first
+            val now: Long = pair.second
+
+            // Step 2: write the return confirmation notification fire-and-forget.
+            // We check existence first because the same document id is used for all
+            // notifications of this loan+type, and a prior partial attempt may have
+            // already written it.
             val notification = LoanPolicy.eventNotification(
                 equipment, uid, AppNotification.TYPE_RETURN,
                 borrowedAt = equipment.borrowedAt, now = now
             )
-            // Only write the notification if the document does not already exist,
-            // so we never violate the allow create / allow update rules.
             val notifRef = db.collection(AppNotification.COLLECTION).document(notification.id)
             notifRef.get().continueWithTask { getTask ->
-                if (!getTask.result!!.exists()) {
+                if (getTask.isSuccessful && getTask.result?.exists() == false) {
                     notifRef.set(notification.toMap())
+                        .continueWith { equipment }
                 } else {
-                    // Already exists (e.g. from a prior partial attempt) — skip write.
-                    com.google.android.gms.tasks.Tasks.forResult(null)
-                }.continueWith { equipment }
+                    // Already exists or get failed — either way return equipment.
+                    Tasks.forResult(equipment)
+                }
             }
         }
     }

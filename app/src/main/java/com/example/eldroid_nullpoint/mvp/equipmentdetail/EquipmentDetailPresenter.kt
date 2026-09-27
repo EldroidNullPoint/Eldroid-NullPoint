@@ -28,8 +28,7 @@ class EquipmentDetailPresenter(
             return
         }
 
-        // Guard: don't register a second listener if one is already active
-        // (can happen when the confirm dialog dismisses and the Activity resumes).
+        // Guard: don't register a second listener if one is already active.
         if (listener != null) return
 
         if (DemoData.isDemoId(equipmentId)) {
@@ -54,8 +53,10 @@ class EquipmentDetailPresenter(
     }
 
     override fun onStop() {
-        listener?.remove()
-        listener = null
+        // Do NOT remove the listener on stop — dialogs (confirm borrow/return)
+        // trigger onStop/onStart on the Activity. Removing the listener here
+        // kills the real-time update and causes a white screen after a return.
+        // The listener is only cleaned up in detach() when the screen fully closes.
     }
 
     override fun onBorrowConfirmed() {
