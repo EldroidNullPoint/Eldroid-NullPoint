@@ -75,20 +75,32 @@ class EquipmentDetailActivity : AppCompatActivity(), EquipmentDetailContract.Vie
     }
 
     private fun confirmBorrow() {
+        com.example.eldroid_nullpoint.util.DebugBroadcaster.broadcast("🟦 Confirm borrow dialog shown")
         MaterialAlertDialogBuilder(this)
             .setTitle(getString(R.string.borrow_confirm_title, binding.tvName.text.toString()))
             .setMessage(getString(R.string.borrow_confirm_message, binding.tvBox.text.toString()))
-            .setNegativeButton(R.string.btn_cancel, null)
-            .setPositiveButton(R.string.btn_confirm) { _, _ -> presenter.onBorrowConfirmed() }
+            .setNegativeButton(R.string.btn_cancel) { _, _ ->
+                com.example.eldroid_nullpoint.util.DebugBroadcaster.broadcast("❎ User cancelled borrow")
+            }
+            .setPositiveButton(R.string.btn_confirm) { _, _ ->
+                com.example.eldroid_nullpoint.util.DebugBroadcaster.broadcast("✔️ User confirmed borrow - calling presenter")
+                presenter.onBorrowConfirmed()
+            }
             .show()
     }
 
     private fun confirmReturn() {
+        com.example.eldroid_nullpoint.util.DebugBroadcaster.broadcast("🟦 Confirm return dialog shown")
         MaterialAlertDialogBuilder(this)
             .setTitle(getString(R.string.return_confirm_title, binding.tvName.text.toString()))
             .setMessage(getString(R.string.return_confirm_message, binding.tvBox.text.toString()))
-            .setNegativeButton(R.string.btn_cancel, null)
-            .setPositiveButton(R.string.btn_confirm) { _, _ -> presenter.onReturnConfirmed() }
+            .setNegativeButton(R.string.btn_cancel) { _, _ ->
+                com.example.eldroid_nullpoint.util.DebugBroadcaster.broadcast("❎ User cancelled return")
+            }
+            .setPositiveButton(R.string.btn_confirm) { _, _ ->
+                com.example.eldroid_nullpoint.util.DebugBroadcaster.broadcast("✔️ User confirmed return - calling presenter")
+                presenter.onReturnConfirmed()
+            }
             .show()
     }
 

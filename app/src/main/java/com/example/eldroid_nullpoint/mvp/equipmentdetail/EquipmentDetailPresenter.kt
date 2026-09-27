@@ -39,16 +39,25 @@ class EquipmentDetailPresenter(
 
         listener = firestore.collection(Equipment.COLLECTION).document(equipmentId)
             .addSnapshotListener { snapshot, error ->
+                android.util.Log.d("DetailPresenter", "Snapshot listener fired for $equipmentId")
+                
                 if (error != null) {
+                    android.util.Log.e("DetailPresenter", "Snapshot error", error)
+                    com.example.eldroid_nullpoint.util.DebugBroadcaster.broadcast("Snapshot error: ${error.message}")
                     view?.showToast("Failed to load equipment details")
                     return@addSnapshotListener
                 }
                 if (snapshot == null || !snapshot.exists()) {
+                    android.util.Log.w("DetailPresenter", "Equipment not found in snapshot")
                     view?.showToast("Equipment not found")
                     view?.close()
                     return@addSnapshotListener
                 }
-                bind(Equipment.from(snapshot))
+                
+                val equipment = Equipment.from(snapshot)
+                android.util.Log.d("DetailPresenter", "Equipment status: ${equipment.status}, borrowedBy: ${equipment.borrowedBy}")
+                com.example.eldroid_nullpoint.util.DebugBroadcaster.broadcast("Equipment ${equipment.name} status: ${equipment.status}")
+                bind(equipment)
             }
     }
 
@@ -60,12 +69,24 @@ class EquipmentDetailPresenter(
     }
 
     override fun onBorrowConfirmed() {
-        val equipment = currentEquipment ?: return
-        if (isSubmitting) return
+        com.example.eldroid_nullpoint.util.DebugBroadcaster.broadcast("🔄 onBorrowConfirmed() called")
+        android.util.Log.d("DetailPresenter", "onBorrowConfirmed() called")
+        
+        val equipment = currentEquipment
+        if (equipment == null) {
+            com.example.eldroid_nullpoint.util.DebugBroadcaster.broadcast("❌ No equipment loaded")
+            return
+        }
+        
+        if (isSubmitting) {
+            com.example.eldroid_nullpoint.util.DebugBroadcaster.broadcast("⚠️ Already submitting, ignoring")
+            return
+        }
+        
         setSubmitting(true)
+        com.example.eldroid_nullpoint.util.DebugBroadcaster.broadcast("📤 Starting borrow transaction for: ${equipment.name}")
 
         android.util.Log.d("DetailPresenter", "Attempting borrow: id=${equipment.id} uid=$currentUid name=$borrowerName")
-        com.example.eldroid_nullpoint.util.DebugBroadcaster.broadcast("Borrow attempt: ${equipment.name}")
 
         SmartDockRepository.borrow(equipment.id, currentUid, borrowerName)
             .addOnSuccessListener { receipt ->
@@ -82,15 +103,29 @@ class EquipmentDetailPresenter(
                 setSubmitting(false)
                 view?.showToast(errorMsg)
             }
+            
+        com.example.eldroid_nullpoint.util.DebugBroadcaster.broadcast("⏳ Waiting for Firebase response...")
     }
 
     override fun onReturnConfirmed() {
-        val equipment = currentEquipment ?: return
-        if (isSubmitting) return
+        com.example.eldroid_nullpoint.util.DebugBroadcaster.broadcast("🔄 onReturnConfirmed() called")
+        android.util.Log.d("DetailPresenter", "onReturnConfirmed() called")
+        
+        val equipment = currentEquipment
+        if (equipment == null) {
+            com.example.eldroid_nullpoint.util.DebugBroadcaster.broadcast("❌ No equipment loaded")
+            return
+        }
+        
+        if (isSubmitting) {
+            com.example.eldroid_nullpoint.util.DebugBroadcaster.broadcast("⚠️ Already submitting, ignoring")
+            return
+        }
+        
         setSubmitting(true)
+        com.example.eldroid_nullpoint.util.DebugBroadcaster.broadcast("📤 Starting return transaction for: ${equipment.name}")
 
         android.util.Log.d("DetailPresenter", "Attempting return: id=${equipment.id} uid=$currentUid name=$borrowerName")
-        com.example.eldroid_nullpoint.util.DebugBroadcaster.broadcast("Return attempt: ${equipment.name}")
 
         SmartDockRepository.returnItem(equipment.id, currentUid, borrowerName)
             .addOnSuccessListener { returned ->
@@ -106,6 +141,8 @@ class EquipmentDetailPresenter(
                 setSubmitting(false)
                 view?.showToast(errorMsg)
             }
+            
+        com.example.eldroid_nullpoint.util.DebugBroadcaster.broadcast("⏳ Waiting for Firebase response...")
     }
 
     fun loadBorrowerName() {
@@ -149,36 +186,6 @@ class EquipmentDetailPresenter(
         // Log full error so Logcat shows the exact cause
         android.util.Log.e("DetailPresenter", "Action error: ${error.javaClass.simpleName}: ${error.message}", error)
 
-        // Build detailed diagnostic message for the user
-        val errorType = error.javaClass.simpleName
-        val errorMsg = error.message ?: "Unknown error"
-        
-        val diagnostic = buildString {
-            append("❌ ERROR DIAGNOSTIC ❌\n\n")
-            append("Error Type: $errorType\n")
-            append("Message: $errorMsg\n\n")
-            
-            when {
-                loanError?.borrowCheck == LoanPolicy.BorrowCheck.ALREADY_BORROWED ->
-                    append("Reason: Equipment already borrowed")
-                loanError?.borrowCheck == LoanPolicy.BorrowCheck.NOT_FOUND ||
-                        loanError?.returnCheck == LoanPolicy.ReturnCheck.NOT_FOUND ->
-                    append("Reason: Equipment not found in database")
-                loanError?.returnCheck == LoanPolicy.ReturnCheck.NOT_YOURS ->
-                    append("Reason: You did not borrow this item")
-                loanError?.returnCheck == LoanPolicy.ReturnCheck.NOT_BORROWED ->
-                    append("Reason: Equipment is not currently borrowed")
-                SmartDockRepository.isPermissionDenied(error) ->
-                    append("Reason: PERMISSION DENIED by Firestore rules\n\nYour Firestore security rules are blocking this operation. Check Firebase Console > Firestore Database > Rules")
-                else ->
-                    append("Reason: Unknown/Unexpected error\n\nFull details:\n${error.stackTraceToString().take(500)}")
-            }
-        }
-        
-        // Show the full diagnostic in a dialog
-        view?.showErrorDialog(diagnostic)
-        
-        // Return short message for Toast
         return when {
             loanError?.borrowCheck == LoanPolicy.BorrowCheck.ALREADY_BORROWED ->
                 "Already borrowed"
@@ -190,8 +197,8 @@ class EquipmentDetailPresenter(
             loanError?.returnCheck == LoanPolicy.ReturnCheck.NOT_BORROWED ->
                 "Not currently borrowed"
             SmartDockRepository.isPermissionDenied(error) ->
-                "PERMISSION_DENIED"
-            else -> "FAILED: $errorType"
+                "PERMISSION_DENIED — Firestore rules blocked this write. Check rules."
+            else -> "FAILED: ${error.javaClass.simpleName}: ${error.message}"
         }
     }
 
