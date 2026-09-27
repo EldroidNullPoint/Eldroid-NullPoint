@@ -35,7 +35,7 @@
                 android:background="#FF0000"
                 android:gravity="center"
                 android:padding="12dp"
-                android:text="✅ NEW BUILD v3 IS RUNNING — DELETE ME"
+                android:text="✅ NEW BUILD v4 IS RUNNING — DELETE ME"
                 android:textColor="#FFFFFF"
                 android:textSize="14sp"
                 android:textStyle="bold"
@@ -43,18 +43,23 @@
             <!-- ===== END TEST BANNER ===== -->
 
             <!-- ===== DEBUG BANNER — shows actual error messages ===== -->
-            <TextView
-                android:id="@+id/tvDebugBanner"
+            <ScrollView
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
+                android:layout_height="120dp"
                 android:background="#FFA500"
-                android:gravity="start"
-                android:padding="12dp"
-                android:text="🔍 Debug: Waiting for borrow/return attempt..."
-                android:textColor="#000000"
-                android:textSize="12sp"
-                android:fontFamily="monospace"
-                android:layout_marginBottom="16dp" />
+                android:layout_marginBottom="16dp">
+                
+                <TextView
+                    android:id="@+id/tvDebugBanner"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:gravity="start"
+                    android:padding="12dp"
+                    android:text="🔍 Debug: Waiting for borrow/return attempt..."
+                    android:textColor="#000000"
+                    android:textSize="11sp"
+                    android:fontFamily="monospace" />
+            </ScrollView>
             <!-- ===== END DEBUG BANNER ===== -->
 
             <!-- ============ Header / greeting ============ -->

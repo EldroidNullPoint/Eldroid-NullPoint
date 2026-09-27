@@ -55,8 +55,14 @@ class EquipmentDetailActivity : AppCompatActivity(), EquipmentDetailContract.Vie
         presenter.loadBorrowerName()
 
         binding.ivBack.setOnClickListener { finish() }
-        binding.btnBorrow.setOnClickListener { confirmBorrow() }
-        binding.btnReturn.setOnClickListener { confirmReturn() }
+        binding.btnBorrow.setOnClickListener { 
+            com.example.eldroid_nullpoint.util.DebugBroadcaster.broadcast("🔴 BORROW BUTTON CLICKED")
+            confirmBorrow() 
+        }
+        binding.btnReturn.setOnClickListener { 
+            com.example.eldroid_nullpoint.util.DebugBroadcaster.broadcast("🔴 RETURN BUTTON CLICKED")
+            confirmReturn() 
+        }
     }
 
     override fun onStart() {
