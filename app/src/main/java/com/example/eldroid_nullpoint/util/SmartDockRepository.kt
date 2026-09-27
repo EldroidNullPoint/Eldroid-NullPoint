@@ -78,20 +78,41 @@ object SmartDockRepository {
             }
 
             val now = System.currentTimeMillis()
+            // 1. Clear the equipment box back to available.
             tx.update(equipmentRef, LoanPolicy.returnUpdate())
+
+            // 2. Append a return entry to the transaction log.
             tx.set(
                 db.collection(Transaction.COLLECTION).document(),
                 LoanPolicy.transactionDoc(current, uid, userName, Transaction.TYPE_RETURN, now)
             )
-            // Keyed by the loan that is ending, so it stays unique per loan.
+
+            // 3. Write the return confirmation notification OUTSIDE the transaction
+            //    (fire-and-forget after commit) to avoid a PERMISSION_DENIED if a
+            //    prior notification with the same deterministic id already exists,
+            //    since the Firestore rule only allows create (new doc) or a read-flip
+            //    update — not a full set() on an existing document.
+            current to now   // pass through to the success callback
+        }.continueWithTask { task ->
+            if (!task.isSuccessful) {
+                throw task.exception ?: Exception("Return transaction failed")
+            }
+            val (equipment, now) = task.result!!
             val notification = LoanPolicy.eventNotification(
-                current, uid, AppNotification.TYPE_RETURN, borrowedAt = current.borrowedAt, now = now
+                equipment, uid, AppNotification.TYPE_RETURN,
+                borrowedAt = equipment.borrowedAt, now = now
             )
-            tx.set(
-                db.collection(AppNotification.COLLECTION).document(notification.id),
-                notification.toMap()
-            )
-            current
+            // Only write the notification if the document does not already exist,
+            // so we never violate the allow create / allow update rules.
+            val notifRef = db.collection(AppNotification.COLLECTION).document(notification.id)
+            notifRef.get().continueWithTask { getTask ->
+                if (!getTask.result!!.exists()) {
+                    notifRef.set(notification.toMap())
+                } else {
+                    // Already exists (e.g. from a prior partial attempt) — skip write.
+                    com.google.android.gms.tasks.Tasks.forResult(null)
+                }.continueWith { equipment }
+            }
         }
     }
 
