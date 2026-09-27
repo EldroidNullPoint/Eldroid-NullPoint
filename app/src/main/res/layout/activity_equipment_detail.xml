@@ -1,7 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?><!--
-    Read-only detail for one SmartDock box. Covers FR-05 (item name, borrow time,
-    return time, box location) and stays a monitoring view: there is no borrow
-    button, because FR-01/FR-03 put the checkout at the tower behind an RFID tap.
+    Detail for one SmartDock box. Covers FR-05 (item name, borrow time, return time,
+    box location) with a live listener, plus a Borrow / Return action that stands in
+    for the RFID tap at the tower while the hardware is being built. Exactly one of
+    the two buttons is shown, and only when the action is valid for this borrower.
 -->
 <androidx.core.widget.NestedScrollView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
@@ -153,6 +154,66 @@
                 android:id="@+id/tvDueAt"
                 style="@style/DetailRowValue"
                 tools:text="Sep 10, 3:12 PM" />
+        </LinearLayout>
+
+        <!-- ============ Borrow / Return action ============ -->
+        <LinearLayout
+            android:id="@+id/actionArea"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="20dp"
+            android:orientation="vertical"
+            android:visibility="gone"
+            tools:visibility="visible">
+
+            <FrameLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content">
+
+                <Button
+                    android:id="@+id/btnBorrow"
+                    android:layout_width="match_parent"
+                    android:layout_height="56dp"
+                    android:background="@drawable/selector_button_primary"
+                    android:elevation="0dp"
+                    android:text="@string/btn_borrow"
+                    android:textAllCaps="false"
+                    android:textColor="@color/white"
+                    android:textSize="16sp"
+                    android:textStyle="bold"
+                    android:visibility="gone"
+                    tools:visibility="visible" />
+
+                <Button
+                    android:id="@+id/btnReturn"
+                    android:layout_width="match_parent"
+                    android:layout_height="56dp"
+                    android:background="@drawable/selector_button_primary"
+                    android:elevation="0dp"
+                    android:text="@string/btn_return"
+                    android:textAllCaps="false"
+                    android:textColor="@color/white"
+                    android:textSize="16sp"
+                    android:textStyle="bold"
+                    android:visibility="gone" />
+
+                <ProgressBar
+                    android:id="@+id/progressAction"
+                    android:layout_width="26dp"
+                    android:layout_height="26dp"
+                    android:layout_gravity="center"
+                    android:indeterminateTint="@color/brand_green"
+                    android:visibility="gone" />
+            </FrameLayout>
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="12dp"
+                android:gravity="center"
+                android:text="@string/action_stand_in_note"
+                android:textColor="@color/text_secondary"
+                android:textSize="12sp" />
         </LinearLayout>
 
     </LinearLayout>

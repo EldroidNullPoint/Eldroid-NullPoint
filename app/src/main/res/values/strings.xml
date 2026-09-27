@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">Eldroid_NullPoint</string>
+    <string name="app_name">SmartDock</string>
 
     <!-- ============================================================
          Google Sign-In
@@ -36,7 +36,7 @@
 
     <!-- Sign up screen -->
     <string name="title_signup">Create Account</string>
-    <string name="subtitle_signup">Sign up to get started with private coaching</string>
+    <string name="subtitle_signup">Sign up to start borrowing equipment from the SmartDock tower</string>
     <string name="hint_first_name">First Name</string>
     <string name="hint_last_name">Last Name</string>
     <string name="hint_confirm_password">Confirm Password</string>
@@ -73,15 +73,15 @@
     <string name="section_my_items">My Borrowed Items</string>
     <string name="section_activity">Recent Activity</string>
     <string name="empty_current_status">You currently have no borrowed equipment.</string>
-    <string name="empty_current_status_hint">Tap your RFID card on the SmartDock tower to borrow an item.</string>
-    <string name="empty_equipment">No equipment has been registered on the SmartDock tower yet.</string>
+    <string name="empty_current_status_hint">Open an available item below and tap Borrow, or tap your RFID card on the SmartDock tower.</string>
+    <string name="empty_equipment">No equipment has been registered on the SmartDock tower yet. Add the sample boxes to try the app.</string>
     <string name="empty_activity">No activity yet. Your borrow and return history will appear here.</string>
     <string name="error_load_dashboard">We couldn\'t load your SmartDock data. Check your connection and try again.</string>
     <string name="btn_retry">Try Again</string>
     <string name="action_refresh">Refresh</string>
     <string name="action_change_password">Change password</string>
     <string name="action_logout">Log out</string>
-    <string name="rfid_notice">Borrowing and returning happen at the SmartDock tower using your RFID card. This screen shows the live status.</string>
+    <string name="rfid_notice">Borrow and return from an item\'s page here, or with your RFID card at the SmartDock tower. This screen always shows the live status.</string>
     <string name="see_all">See all</string>
     <string name="demo_subtitle">Sample data - no equipment registered yet</string>
     <string name="available_count">%1$d of %2$d available</string>
@@ -102,8 +102,8 @@
     <string name="detail_holder">Currently with</string>
     <string name="detail_holder_you">You</string>
     <string name="detail_holder_other">Another borrower</string>
-    <string name="detail_hint_borrow">This item is in its box. Tap your RFID card on the SmartDock tower, then take it from Box %1$d.</string>
-    <string name="detail_hint_return">Tap your RFID card on the tower, then place this item back in Box %1$d to return it.</string>
+    <string name="detail_hint_borrow">This item is in its box. Tap Borrow below (or your RFID card on the tower), then take it from Box %1$d.</string>
+    <string name="detail_hint_return">Place this item back in Box %1$d and tap Return below (or tap your RFID card on the tower).</string>
     <string name="detail_hint_unavailable">This item is currently borrowed. It will show as available here as soon as it is returned to Box %1$d.</string>
     <string name="detail_hint_overdue">This item is overdue. Please return it to Box %1$d as soon as possible - overdue items are escalated to the administrator.</string>
     <string name="detail_not_found">This equipment is no longer registered on the SmartDock tower.</string>
@@ -124,9 +124,76 @@
     <string name="activity_overdue">%1$s is overdue</string>
     <string name="activity_alert">Alert for %1$s</string>
 
-    <!-- Home screen -->
-    <string name="welcome_message">Welcome</string>
+    <!-- Borrow / return actions (in-app stand-in for the tower) -->
+    <string name="btn_borrow">Borrow</string>
+    <string name="btn_return">Return</string>
+    <string name="borrow_confirm_title">Borrow %1$s?</string>
+    <string name="borrow_confirm_message">It will be recorded under your name from Box %1$d and is due back in 24 hours.</string>
+    <string name="return_confirm_title">Return %1$s?</string>
+    <string name="return_confirm_message">Confirm that the item is back in Box %1$d.</string>
+    <string name="btn_confirm">Confirm</string>
+    <string name="btn_cancel">Cancel</string>
+    <string name="return_success">%1$s returned to Box %2$d. Thank you!</string>
+    <string name="error_already_borrowed">Someone else just borrowed this item.</string>
+    <string name="error_not_your_item">Only the borrower who took this item can return it.</string>
+    <string name="error_not_borrowed">This item is already in its box.</string>
+    <string name="error_permission_denied">Firestore refused the change. Ask the administrator to deploy the app\'s security rules.</string>
+    <string name="error_action_failed">Something went wrong. Check your connection and try again.</string>
+    <string name="action_stand_in_note">While the SmartDock tower is being built, the app records borrows and returns directly.</string>
+
+    <!-- Borrow confirmation screen (FR-05) -->
+    <string name="title_borrow_confirmation">Borrowing confirmed!</string>
+    <string name="subtitle_borrow_confirmation">Your borrow has been recorded. Here are the details.</string>
+    <string name="label_item">Item</string>
+    <string name="label_box_location">Box location</string>
+    <string name="label_borrowed_time">Borrowed at</string>
+    <string name="label_due_time">Return by</string>
+    <string name="borrow_confirmation_reminder">We\'ll remind you an hour before it\'s due and again if it becomes overdue.</string>
+    <string name="btn_back_to_dashboard">Back to dashboard</string>
+    <string name="btn_view_item">View item</string>
+
+    <!-- Seeding sample equipment -->
+    <string name="btn_seed_equipment">Add sample equipment</string>
+    <string name="seed_confirm_title">Add sample equipment?</string>
+    <string name="seed_confirm_message">This creates 10 sample SmartDock boxes in the shared database so everyone can try borrowing. You only need to do this once.</string>
+    <string name="seed_success">Sample equipment added.</string>
+    <string name="seed_failed">Couldn\'t add the sample equipment. It may already exist.</string>
+
+    <!-- Notifications -->
+    <string name="title_notifications">Notifications</string>
+    <string name="subtitle_notifications">Borrow confirmations and due-date reminders</string>
+    <string name="empty_notifications">No notifications yet. You\'ll see borrow confirmations and due-date reminders here.</string>
+    <string name="action_notifications">Notifications</string>
+    <string name="mark_all_read">Mark all read</string>
+    <string name="unread_badge_max">9+</string>
+    <string name="notification_channel_name">Due-date reminders</string>
+    <string name="notification_channel_description">Reminders before borrowed equipment is due and alerts when it is overdue.</string>
+    <string name="notification_type_borrow">Borrowed</string>
+    <string name="notification_type_return">Returned</string>
+    <string name="notification_type_due_soon">Due soon</string>
+    <string name="notification_type_overdue">Overdue</string>
+
+    <!-- Profile -->
+    <string name="title_profile">Profile</string>
+    <string name="subtitle_profile">Your borrower account</string>
+    <string name="action_profile">Profile</string>
+    <string name="provider_email">Email &amp; password</string>
+    <string name="provider_google">Google account</string>
+    <string name="section_personal_details">Personal details</string>
+    <string name="section_rfid_card">RFID card</string>
+    <string name="hint_rfid_card_uid">RFID card UID (e.g. 04 A3 2B 1C)</string>
+    <string name="rfid_card_helper">Normally registered by the equipment room administrator. Enter it here for demonstrations.</string>
+    <string name="error_rfid_invalid">Use 4 to 32 letters, numbers, spaces, colons or dashes</string>
+    <string name="section_preferences">Preferences</string>
+    <string name="pref_due_reminders">Due-date reminders</string>
+    <string name="pref_due_reminders_hint">Notify me an hour before an item is due and when it becomes overdue.</string>
+    <string name="section_account">Account</string>
+    <string name="btn_save_profile">Save changes</string>
+    <string name="profile_saved">Profile updated.</string>
     <string name="btn_logout">Log out</string>
+    <string name="logout_confirm_title">Log out?</string>
+    <string name="logout_confirm_message">You can log back in any time with the same account.</string>
+    <string name="notifications_permission_hint">Allow notifications in system settings so reminders can appear.</string>
 
     <!-- Validation error messages -->
     <string name="error_email_required">Email is required</string>

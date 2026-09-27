@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?><!--
-    Shared "See all" screen: a titled full list with loading / empty / error states.
-    Used by both EquipmentListActivity and ActivityHistoryActivity, which only
-    differ in what they load and which row layout they bind.
+    Shared full-list screen: a titled list with loading / empty / error states.
+    Used by EquipmentListActivity, ActivityHistoryActivity and NotificationsActivity,
+    which only differ in what they load and which row layout they bind.
 -->
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
@@ -21,16 +21,32 @@
         android:padding="6dp"
         android:src="@drawable/ic_back" />
 
-    <TextView
-        android:id="@+id/tvTitle"
-        android:layout_width="wrap_content"
+    <LinearLayout
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginTop="8dp"
-        android:fontFamily="sans-serif-medium"
-        android:textColor="@color/text_primary"
-        android:textSize="26sp"
-        android:textStyle="bold"
-        tools:text="Equipment" />
+        android:gravity="center_vertical"
+        android:orientation="horizontal">
+
+        <TextView
+            android:id="@+id/tvTitle"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:fontFamily="sans-serif-medium"
+            android:textColor="@color/text_primary"
+            android:textSize="26sp"
+            android:textStyle="bold"
+            tools:text="Equipment" />
+
+        <!-- Optional screen-level action, e.g. "Mark all read" on Notifications. -->
+        <TextView
+            android:id="@+id/btnHeaderAction"
+            style="@style/SeeAllButton"
+            android:text="@string/mark_all_read"
+            android:visibility="gone"
+            tools:visibility="visible" />
+    </LinearLayout>
 
     <TextView
         android:id="@+id/tvSubtitle"

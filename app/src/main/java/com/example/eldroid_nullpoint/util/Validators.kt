@@ -33,6 +33,20 @@ object Validators {
     }
 
     /**
+     * An RFID card UID as printed by the MFRC522 reader: 4-32 characters made of
+     * hex/alphanumerics with optional space, colon or dash separators
+     * ("04 A3 2B 1C", "04:A3:2B:1C", "04A32B1C"). Blank is allowed - it means the
+     * borrower has no card linked yet.
+     */
+    fun isValidRfidUid(uid: String): Boolean {
+        val trimmed = uid.trim()
+        if (trimmed.isEmpty()) return true
+        return trimmed.length in 4..32 &&
+                trimmed.all { it.isLetterOrDigit() || it == ' ' || it == ':' || it == '-' } &&
+                trimmed.any { it.isLetterOrDigit() }
+    }
+
+    /**
      * Returns a human-readable reason why [password] is not strong, or null if it is valid.
      * The order matters: the borrower is told about one fixable problem at a time.
      */

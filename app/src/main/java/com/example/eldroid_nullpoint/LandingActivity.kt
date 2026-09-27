@@ -7,6 +7,7 @@ import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.core.view.updatePadding
 import com.example.eldroid_nullpoint.databinding.ActivityLandingBinding
+import com.google.firebase.auth.FirebaseAuth
 
 /**
  * First screen of the app for a signed-out borrower: the SmartDock artwork on the
@@ -24,7 +25,12 @@ class LandingActivity : AppCompatActivity() {
         applySystemBarInsets()
 
         binding.btnGetStarted.setOnClickListener {
-            startActivity(Intent(this, OnboardingActivity::class.java))
+            // A borrower with a live session skips the tutorial and login and
+            // goes straight to the dashboard; everyone else enters onboarding.
+            val signedIn = FirebaseAuth.getInstance().currentUser != null
+            val destination = if (signedIn) HomeActivity::class.java else OnboardingActivity::class.java
+            startActivity(Intent(this, destination))
+            if (signedIn) finish()
         }
     }
 

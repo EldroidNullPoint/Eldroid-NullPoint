@@ -1,9 +1,10 @@
 {
   "_comment": [
     "Reference data for the shared `equipment` collection - the SmartDock boxes a",
-    "school typically lends to faculty and students. The app NEVER writes these:",
-    "create them once from the Firebase console (or the admin/tower side), using the",
-    "object key as the document ID.",
+    "school typically lends to faculty and students. The borrower app mirrors this",
+    "list in util/SeedEquipment.kt and offers a one-tap 'Add sample equipment'",
+    "action on the dashboard while the collection is empty; you can also create the",
+    "documents from the Firebase console, using the object key as the document ID.",
     "",
     "Every item here is small enough to fit inside a SmartDock box and be sensed by",
     "the item-presence sensor. Bulky equipment (TVs, monitors) is not lendable",
@@ -12,7 +13,8 @@
     "Field contract: name (String), category (String), boxNumber (Integer),",
     "status ('available' | 'borrowed'), borrowedBy (String uid or ''),",
     "borrowedByName (String or ''), borrowedAt (Long epoch millis or 0),",
-    "dueAt (Long epoch millis or 0).",
+    "dueAt (Long epoch millis or 0). Borrow/return transitions are validated by",
+    "firestore.rules and produced by util/LoanPolicy.kt.",
     "",
     "The borrower app picks each thumbnail from `category` + `name`, so no image",
     "field is stored here. See EquipmentImages.kt for the keyword mapping."

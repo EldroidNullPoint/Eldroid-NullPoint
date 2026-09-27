@@ -1,8 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?><!--
-    Borrower dashboard. Read-only monitoring surface for the SmartDock tower:
-    greeting, current borrowing status, equipment availability, the borrower's own
-    items and their recent activity. There is deliberately no "Borrow" action here -
-    borrowing and returning happen physically at the tower via RFID.
+    Borrower dashboard and navigation hub: greeting, current borrowing status,
+    equipment availability, the borrower's own items and their recent activity.
+    Header icons lead to Notifications and Profile; each section's "See all" leads
+    to its full-screen list; tapping any item opens its detail page, where the
+    Borrow / Return actions live.
 -->
 <FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
@@ -68,25 +69,48 @@
                     android:padding="7dp"
                     android:src="@drawable/ic_refresh" />
 
-                <ImageView
-                    android:id="@+id/ivChangePassword"
+                <FrameLayout
                     android:layout_width="38dp"
                     android:layout_height="38dp"
-                    android:layout_marginStart="2dp"
-                    android:background="?attr/selectableItemBackgroundBorderless"
-                    android:contentDescription="@string/action_change_password"
-                    android:padding="7dp"
-                    android:src="@drawable/ic_shield_lock" />
+                    android:layout_marginStart="2dp">
+
+                    <ImageView
+                        android:id="@+id/ivNotifications"
+                        android:layout_width="38dp"
+                        android:layout_height="38dp"
+                        android:background="?attr/selectableItemBackgroundBorderless"
+                        android:contentDescription="@string/action_notifications"
+                        android:padding="7dp"
+                        android:src="@drawable/ic_bell"
+                        app:tint="@color/brand_dark_green" />
+
+                    <TextView
+                        android:id="@+id/tvUnreadBadge"
+                        android:layout_width="wrap_content"
+                        android:layout_height="18dp"
+                        android:layout_gravity="top|end"
+                        android:background="@drawable/bg_badge"
+                        android:gravity="center"
+                        android:minWidth="18dp"
+                        android:paddingHorizontal="4dp"
+                        android:textColor="@color/white"
+                        android:textSize="10sp"
+                        android:textStyle="bold"
+                        android:visibility="gone"
+                        tools:text="2"
+                        tools:visibility="visible" />
+                </FrameLayout>
 
                 <ImageView
-                    android:id="@+id/ivLogout"
+                    android:id="@+id/ivProfile"
                     android:layout_width="38dp"
                     android:layout_height="38dp"
                     android:layout_marginStart="2dp"
                     android:background="?attr/selectableItemBackgroundBorderless"
-                    android:contentDescription="@string/action_logout"
+                    android:contentDescription="@string/action_profile"
                     android:padding="7dp"
-                    android:src="@drawable/ic_logout" />
+                    android:src="@drawable/ic_person"
+                    app:tint="@color/brand_dark_green" />
             </LinearLayout>
 
             <!-- ============ Error state ============ -->
@@ -434,11 +458,52 @@
                     tools:itemCount="3"
                     tools:listitem="@layout/item_equipment" />
 
-                <TextView
-                    android:id="@+id/tvEmptyEquipment"
-                    style="@style/DashboardEmptyText"
-                    android:text="@string/empty_equipment"
-                    android:visibility="gone" />
+                <LinearLayout
+                    android:id="@+id/emptyEquipmentCard"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="10dp"
+                    android:background="@drawable/bg_card_muted"
+                    android:orientation="vertical"
+                    android:padding="18dp"
+                    android:visibility="gone"
+                    tools:visibility="visible">
+
+                    <TextView
+                        android:id="@+id/tvEmptyEquipment"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:lineSpacingExtra="3dp"
+                        android:text="@string/empty_equipment"
+                        android:textColor="@color/text_secondary"
+                        android:textSize="13sp" />
+
+                    <FrameLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="14dp">
+
+                        <Button
+                            android:id="@+id/btnSeedEquipment"
+                            android:layout_width="match_parent"
+                            android:layout_height="48dp"
+                            android:background="@drawable/selector_button_primary"
+                            android:elevation="0dp"
+                            android:text="@string/btn_seed_equipment"
+                            android:textAllCaps="false"
+                            android:textColor="@color/white"
+                            android:textSize="14sp"
+                            android:textStyle="bold" />
+
+                        <ProgressBar
+                            android:id="@+id/progressSeed"
+                            android:layout_width="22dp"
+                            android:layout_height="22dp"
+                            android:layout_gravity="center"
+                            android:indeterminateTint="@color/white"
+                            android:visibility="gone" />
+                    </FrameLayout>
+                </LinearLayout>
 
                 <!-- == Recent activity == -->
                 <LinearLayout

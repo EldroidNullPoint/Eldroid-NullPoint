@@ -13,13 +13,13 @@ import java.util.concurrent.TimeUnit
  * with nothing (or cannot be read at all). The moment real equipment documents
  * exist, they win and the demo content disappears on its own.
  *
- * To turn it off completely for the final build, set [ENABLED] to false - that is
- * the single switch, no other file needs touching.
+ * Switched off ([ENABLED] = false) now that the dashboard can seed real documents
+ * with the "Add sample equipment" action; flip it back on only for offline demos.
  */
 object DemoData {
 
     /** Master switch for the placeholder dashboard content. */
-    const val ENABLED = true
+    const val ENABLED = false
 
     private const val DEMO_ID_PREFIX = "demo_box_"
 

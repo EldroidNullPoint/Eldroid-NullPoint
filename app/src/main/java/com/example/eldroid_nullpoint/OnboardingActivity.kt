@@ -47,7 +47,7 @@ class OnboardingActivity : AppCompatActivity() {
 
         applySystemBarInsets()
 
-        binding.tvSkip.setOnClickListener { goToStep(lastStep) }
+        binding.tvSkip.setOnClickListener { leaveOnboardingFor(LoginActivity::class.java) }
         binding.btnNext.setOnClickListener { goToStep(currentStep + 1) }
 
         // Routed through the dispatcher so the arrow and the system back gesture
@@ -93,10 +93,8 @@ class OnboardingActivity : AppCompatActivity() {
 
     /**
      * Back walks the tutorial in reverse one step at a time, so any earlier step
-     * can be read again - including after Skip, which is why this follows the
-     * step order rather than the screens actually visited. From the first step it
-     * falls through to the default behaviour, which finishes this activity and
-     * returns to Landing rather than jumping ahead to Login.
+     * can be read again. From the first step it falls through to the default
+     * behaviour, which finishes this activity and returns to Landing.
      */
     private fun registerBackNavigation() {
         onBackPressedDispatcher.addCallback(this, object : OnBackPressedCallback(true) {

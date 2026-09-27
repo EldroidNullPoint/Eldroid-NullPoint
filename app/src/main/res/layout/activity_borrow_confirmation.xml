@@ -1,0 +1,192 @@
+<?xml version="1.0" encoding="utf-8"?><!--
+    FR-05 borrow confirmation: shown once right after a successful borrow with the
+    item name, box location, borrow time and required return time.
+-->
+<androidx.core.widget.NestedScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/white"
+    android:fillViewport="true"
+    tools:context=".BorrowConfirmationActivity">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="center_horizontal"
+        android:orientation="vertical"
+        android:paddingHorizontal="28dp"
+        android:paddingTop="56dp"
+        android:paddingBottom="32dp">
+
+        <ImageView
+            android:layout_width="88dp"
+            android:layout_height="88dp"
+            android:background="@drawable/bg_circle_light"
+            android:contentDescription="@null"
+            android:padding="18dp"
+            android:src="@drawable/ic_check_circle" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="22dp"
+            android:fontFamily="sans-serif-medium"
+            android:text="@string/title_borrow_confirmation"
+            android:textColor="@color/text_primary"
+            android:textSize="26sp"
+            android:textStyle="bold" />
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:gravity="center"
+            android:text="@string/subtitle_borrow_confirmation"
+            android:textColor="@color/text_secondary"
+            android:textSize="14sp" />
+
+        <!-- Receipt card -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="28dp"
+            android:background="@drawable/bg_card"
+            android:orientation="vertical"
+            android:padding="18dp">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:gravity="center_vertical"
+                android:orientation="horizontal">
+
+                <com.google.android.material.imageview.ShapeableImageView
+                    android:id="@+id/ivPhoto"
+                    android:layout_width="64dp"
+                    android:layout_height="64dp"
+                    android:background="@drawable/bg_thumbnail"
+                    android:contentDescription="@null"
+                    android:scaleType="centerCrop"
+                    app:shapeAppearanceOverlay="@style/EquipmentThumbnailShape"
+                    tools:src="@drawable/equip_projector" />
+
+                <LinearLayout
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="14dp"
+                    android:layout_weight="1"
+                    android:orientation="vertical">
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="@string/label_item"
+                        android:textColor="@color/text_secondary"
+                        android:textSize="12sp" />
+
+                    <TextView
+                        android:id="@+id/tvItemName"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="2dp"
+                        android:fontFamily="sans-serif-medium"
+                        android:textColor="@color/text_primary"
+                        android:textSize="17sp"
+                        android:textStyle="bold"
+                        tools:text="Epson LCD Projector" />
+                </LinearLayout>
+            </LinearLayout>
+
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="1dp"
+                android:layout_marginTop="16dp"
+                android:background="@color/divider" />
+
+            <LinearLayout style="@style/DetailRow">
+
+                <TextView
+                    style="@style/DetailRowLabel"
+                    android:text="@string/label_box_location" />
+
+                <TextView
+                    android:id="@+id/tvBox"
+                    style="@style/DetailRowValue"
+                    tools:text="Box 1" />
+            </LinearLayout>
+
+            <LinearLayout style="@style/DetailRow">
+
+                <TextView
+                    style="@style/DetailRowLabel"
+                    android:text="@string/label_borrowed_time" />
+
+                <TextView
+                    android:id="@+id/tvBorrowedAt"
+                    style="@style/DetailRowValue"
+                    tools:text="Sep 15, 9:12 AM" />
+            </LinearLayout>
+
+            <LinearLayout style="@style/DetailRow">
+
+                <TextView
+                    style="@style/DetailRowLabel"
+                    android:text="@string/label_due_time" />
+
+                <TextView
+                    android:id="@+id/tvDueAt"
+                    style="@style/DetailRowValue"
+                    android:textColor="@color/brand_green"
+                    tools:text="Sep 16, 9:12 AM" />
+            </LinearLayout>
+        </LinearLayout>
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="16dp"
+            android:background="@drawable/bg_card_success"
+            android:drawablePadding="10dp"
+            android:drawableStart="@drawable/ic_clock"
+            android:gravity="center_vertical"
+            android:lineSpacingExtra="3dp"
+            android:padding="16dp"
+            android:text="@string/borrow_confirmation_reminder"
+            android:textColor="@color/brand_dark_green"
+            android:textSize="13sp" />
+
+        <Space
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="1" />
+
+        <Button
+            android:id="@+id/btnBackToDashboard"
+            android:layout_width="match_parent"
+            android:layout_height="56dp"
+            android:layout_marginTop="28dp"
+            android:background="@drawable/selector_button_primary"
+            android:elevation="0dp"
+            android:text="@string/btn_back_to_dashboard"
+            android:textAllCaps="false"
+            android:textColor="@color/white"
+            android:textSize="16sp"
+            android:textStyle="bold" />
+
+        <Button
+            android:id="@+id/btnViewItem"
+            android:layout_width="match_parent"
+            android:layout_height="56dp"
+            android:layout_marginTop="12dp"
+            android:background="@drawable/bg_button_outline"
+            android:elevation="0dp"
+            android:text="@string/btn_view_item"
+            android:textAllCaps="false"
+            android:textColor="@color/white"
+            android:textSize="16sp"
+            android:textStyle="bold" />
+
+    </LinearLayout>
+</androidx.core.widget.NestedScrollView>
