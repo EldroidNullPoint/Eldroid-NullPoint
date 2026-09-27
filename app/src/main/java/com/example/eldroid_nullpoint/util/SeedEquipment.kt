@@ -40,7 +40,7 @@ object SeedEquipment {
         "status" to Equipment.STATUS_AVAILABLE,
         "borrowedBy" to "",
         "borrowedByName" to "",
-        "borrowedAt" to 0,   // Int 0 — matches Firestore rule: incoming().borrowedAt == 0
-        "dueAt" to 0         // Int 0 — matches Firestore rule: incoming().dueAt == 0
+        "borrowedAt" to 0L,
+        "dueAt" to 0L
     )
 }
