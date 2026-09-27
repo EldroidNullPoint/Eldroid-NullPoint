@@ -12,13 +12,16 @@ data class User(
     val firstName: String = "",
     val lastName: String = "",
     val email: String = "",
-    val provider: String = "email", // "email", "google.com" or "facebook.com"
+    val provider: String = "email", // "email" or "google.com"
     /**
      * UID of the physical RFID card the borrower taps on the SmartDock tower.
-     * Assigned by the administrator side, so it stays empty for app-created
-     * profiles. The default keeps existing user documents readable unchanged.
+     * Normally assigned by the administrator side; the Profile screen also lets a
+     * borrower enter it for demonstrations. The default keeps existing user
+     * documents readable unchanged.
      */
     val rfidCardUid: String = "",
+    /** Whether due-soon / overdue reminders may be shown on the borrower's phone (FR-06). */
+    val notificationsEnabled: Boolean = true,
     val createdAt: Long = System.currentTimeMillis()
 ) {
     /** "First Last", or whichever half is present. Empty when the profile has no name. */

@@ -9,22 +9,15 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
 import com.example.eldroid_nullpoint.databinding.ActivityEquipmentDetailBinding
 import com.example.eldroid_nullpoint.model.Equipment
-import com.example.eldroid_nullpoint.util.DemoData
+import com.example.eldroid_nullpoint.mvp.equipmentdetail.EquipmentDetailContract
+import com.example.eldroid_nullpoint.mvp.equipmentdetail.EquipmentDetailPresenter
 import com.example.eldroid_nullpoint.util.EquipmentImages
+import com.example.eldroid_nullpoint.util.SmartDockRepository
 import com.example.eldroid_nullpoint.util.TimeFormat
+import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.google.firebase.auth.FirebaseAuth
-import com.google.firebase.firestore.FirebaseFirestore
-import com.google.firebase.firestore.ListenerRegistration
 
-/**
- * Detail view for a single SmartDock box.
- *
- * Covers FR-05 (item name, borrow time, required return time and box location) and
- * keeps a live listener on the document so the screen follows the tower in real
- * time (FR-09/FR-10). Read-only by design: the borrow and return actions belong to
- * the RFID tap at the tower, never to the phone.
- */
-class EquipmentDetailActivity : AppCompatActivity() {
+class EquipmentDetailActivity : AppCompatActivity(), EquipmentDetailContract.View {
 
     companion object {
         private const val EXTRA_EQUIPMENT_ID = "extra_equipment_id"
@@ -35,87 +28,81 @@ class EquipmentDetailActivity : AppCompatActivity() {
     }
 
     private lateinit var binding: ActivityEquipmentDetailBinding
-    private lateinit var firestore: FirebaseFirestore
-
-    private var listener: ListenerRegistration? = null
-    private var equipmentId: String = ""
-    private var currentUid: String = ""
+    private lateinit var presenter: EquipmentDetailPresenter
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = ActivityEquipmentDetailBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
-        equipmentId = intent.getStringExtra(EXTRA_EQUIPMENT_ID).orEmpty()
+        val equipmentId = intent.getStringExtra(EXTRA_EQUIPMENT_ID).orEmpty()
         if (equipmentId.isBlank()) {
             finish()
             return
         }
 
-        firestore = FirebaseFirestore.getInstance()
-        currentUid = FirebaseAuth.getInstance().currentUser?.uid.orEmpty()
+        val user = FirebaseAuth.getInstance().currentUser
+        val currentUid = user?.uid.orEmpty()
+        val borrowerName = user?.displayName.orEmpty()
+
+        presenter = EquipmentDetailPresenter(
+            view = this,
+            context = this,
+            equipmentId = equipmentId,
+            currentUid = currentUid,
+            borrowerName = borrowerName
+        )
+        presenter.loadBorrowerName()
 
         binding.ivBack.setOnClickListener { finish() }
+        binding.btnBorrow.setOnClickListener { confirmBorrow() }
+        binding.btnReturn.setOnClickListener { confirmReturn() }
     }
 
     override fun onStart() {
         super.onStart()
-        if (equipmentId.isBlank()) return
-
-        // Placeholder rows have no Firestore document behind them, so they render
-        // straight from DemoData instead of opening a listener that would 404.
-        if (DemoData.isDemoId(equipmentId)) {
-            val demo = DemoData.equipmentById(equipmentId, currentUid)
-            if (demo == null) {
-                finish()
-            } else {
-                render(demo)
-            }
-            return
-        }
-
-        listener = firestore.collection(Equipment.COLLECTION).document(equipmentId)
-            .addSnapshotListener { snapshot, error ->
-                if (error != null) {
-                    Toast.makeText(
-                        this,
-                        getString(R.string.error_load_dashboard),
-                        Toast.LENGTH_LONG
-                    ).show()
-                    return@addSnapshotListener
-                }
-                if (snapshot == null || !snapshot.exists()) {
-                    Toast.makeText(
-                        this,
-                        getString(R.string.detail_not_found),
-                        Toast.LENGTH_LONG
-                    ).show()
-                    finish()
-                    return@addSnapshotListener
-                }
-                render(Equipment.from(snapshot))
-            }
+        presenter.onStart()
     }
 
     override fun onStop() {
         super.onStop()
-        listener?.remove()
-        listener = null
+        presenter.onStop()
     }
 
-    private fun render(equipment: Equipment) {
+    override fun onDestroy() {
+        super.onDestroy()
+        presenter.detach()
+    }
+
+    private fun confirmBorrow() {
+        MaterialAlertDialogBuilder(this)
+            .setTitle(getString(R.string.borrow_confirm_title, binding.tvName.text.toString()))
+            .setMessage(getString(R.string.borrow_confirm_message, binding.tvBox.text.toString()))
+            .setNegativeButton(R.string.btn_cancel, null)
+            .setPositiveButton(R.string.btn_confirm) { _, _ -> presenter.onBorrowConfirmed() }
+            .show()
+    }
+
+    private fun confirmReturn() {
+        MaterialAlertDialogBuilder(this)
+            .setTitle(getString(R.string.return_confirm_title, binding.tvName.text.toString()))
+            .setMessage(getString(R.string.return_confirm_message, binding.tvBox.text.toString()))
+            .setNegativeButton(R.string.btn_cancel, null)
+            .setPositiveButton(R.string.btn_confirm) { _, _ -> presenter.onReturnConfirmed() }
+            .show()
+    }
+
+    // ---------------------------------------------------------------
+    // EquipmentDetailContract.View
+    // ---------------------------------------------------------------
+
+    override fun renderEquipment(equipment: Equipment, currentUid: String) {
         val isMine = equipment.isBorrowedBy(currentUid)
         val isOverdue = equipment.isOverdue()
 
         binding.tvName.text = equipment.name.ifBlank { getString(R.string.title_equipment_detail) }
-        EquipmentImages.bindInto(
-            binding.ivPhoto,
-            equipment.name,
-            equipment.category,
-            fallbackPaddingDp = 60
-        )
+        EquipmentImages.bindInto(binding.ivPhoto, equipment.name, equipment.category, fallbackPaddingDp = 60)
 
-        // Status pill mirrors the dashboard wording exactly, so the two never disagree.
         val (statusLabel, pillBackground, pillTextColor) = when {
             isMine && isOverdue -> Triple(
                 getString(R.string.status_overdue),
@@ -142,7 +129,6 @@ class EquipmentDetailActivity : AppCompatActivity() {
         binding.tvStatusPill.setBackgroundResource(pillBackground)
         binding.tvStatusPill.setTextColor(ContextCompat.getColor(this, pillTextColor))
 
-        // Tells the borrower what to physically do at the tower next.
         binding.tvHint.text = when {
             isMine && isOverdue -> getString(R.string.detail_hint_overdue, equipment.boxNumber)
             isMine -> getString(R.string.detail_hint_return, equipment.boxNumber)
@@ -152,11 +138,8 @@ class EquipmentDetailActivity : AppCompatActivity() {
 
         binding.rowCategory.visibility = if (equipment.category.isBlank()) View.GONE else View.VISIBLE
         binding.tvCategory.text = equipment.category
-
         binding.tvBox.text = getString(R.string.box_label, equipment.boxNumber)
 
-        // Who is holding it. Another borrower's name is never shown - that is
-        // administrator information, so it stays deliberately vague here.
         if (equipment.isBorrowed) {
             binding.rowHolder.visibility = View.VISIBLE
             binding.tvHolder.text = if (isMine) {
@@ -168,7 +151,6 @@ class EquipmentDetailActivity : AppCompatActivity() {
             binding.rowHolder.visibility = View.GONE
         }
 
-        // Times are only meaningful for the borrower's own active loan.
         if (isMine && equipment.borrowedAt > 0L) {
             binding.rowBorrowedAt.visibility = View.VISIBLE
             binding.tvBorrowedAt.text = TimeFormat.dateTime(equipment.borrowedAt)
@@ -181,13 +163,42 @@ class EquipmentDetailActivity : AppCompatActivity() {
             binding.tvDueAt.text =
                 "${TimeFormat.dateTime(equipment.dueAt)}  ·  ${TimeFormat.dueLabel(equipment.dueAt)}"
             binding.tvDueAt.setTextColor(
-                ContextCompat.getColor(
-                    this,
-                    if (isOverdue) R.color.error_red else R.color.text_primary
-                )
+                ContextCompat.getColor(this, if (isOverdue) R.color.error_red else R.color.text_primary)
             )
         } else {
             binding.rowDueAt.visibility = View.GONE
         }
+    }
+
+    override fun showBorrowButton(visible: Boolean) {
+        binding.btnBorrow.visibility = if (visible) View.VISIBLE else View.GONE
+    }
+
+    override fun showReturnButton(visible: Boolean) {
+        binding.btnReturn.visibility = if (visible) View.VISIBLE else View.GONE
+    }
+
+    override fun showActionArea(visible: Boolean) {
+        binding.actionArea.visibility = if (visible) View.VISIBLE else View.GONE
+    }
+
+    override fun setSubmitting(submitting: Boolean) {
+        binding.progressAction.visibility = if (submitting) View.VISIBLE else View.GONE
+        binding.btnBorrow.isEnabled = !submitting
+        binding.btnReturn.isEnabled = !submitting
+        binding.btnBorrow.alpha = if (submitting) 0.6f else 1f
+        binding.btnReturn.alpha = if (submitting) 0.6f else 1f
+    }
+
+    override fun showToast(message: String) {
+        Toast.makeText(this, message, Toast.LENGTH_LONG).show()
+    }
+
+    override fun navigateToBorrowConfirmation(receipt: SmartDockRepository.BorrowReceipt) {
+        startActivity(BorrowConfirmationActivity.intent(this, receipt))
+    }
+
+    override fun close() {
+        finish()
     }
 }

@@ -86,4 +86,24 @@ class ValidatorsTest {
         assertFalse(Validators.isValidName("---"))
         assertFalse(Validators.isValidName("!@#"))
     }
+
+    @Test
+    fun `accepts RFID card UIDs in the formats a reader prints`() {
+        assertTrue(Validators.isValidRfidUid("04 A3 2B 1C"))
+        assertTrue(Validators.isValidRfidUid("04:A3:2B:1C"))
+        assertTrue(Validators.isValidRfidUid("04A32B1C"))
+        assertTrue(Validators.isValidRfidUid("  1a2b3c4d  "))
+        // Blank means "no card linked yet" and is allowed.
+        assertTrue(Validators.isValidRfidUid(""))
+        assertTrue(Validators.isValidRfidUid("   "))
+    }
+
+    @Test
+    fun `rejects RFID card UIDs that are too short, too long or contain symbols`() {
+        assertFalse(Validators.isValidRfidUid("04A"))
+        assertFalse(Validators.isValidRfidUid("A".repeat(33)))
+        assertFalse(Validators.isValidRfidUid("04_A3_2B"))
+        assertFalse(Validators.isValidRfidUid("04.A3.2B"))
+        assertFalse(Validators.isValidRfidUid("----"))
+    }
 }

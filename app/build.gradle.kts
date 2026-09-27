@@ -55,6 +55,8 @@ dependencies {
     // Google Sign-In
     implementation(libs.play.services.auth)
 
+    // Background due-date checks for FR-06 reminders
+    implementation(libs.androidx.work.runtime.ktx)
 
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)

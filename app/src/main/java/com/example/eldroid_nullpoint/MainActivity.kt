@@ -5,11 +5,11 @@ import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
 import androidx.appcompat.app.AppCompatActivity
-import com.google.firebase.auth.FirebaseAuth
 
 /**
- * Splash / router activity. Decides whether the borrower should land on the
- * Home dashboard (session already exists) or the Landing page.
+ * Splash activity. Every launch starts on the Landing page; Landing decides
+ * whether "Get Started" continues into onboarding or straight to Home for a
+ * borrower who is already signed in.
  */
 class MainActivity : AppCompatActivity() {
 
@@ -19,20 +19,8 @@ class MainActivity : AppCompatActivity() {
 
         // Small delay purely so the splash briefly shows; not required for logic.
         Handler(Looper.getMainLooper()).postDelayed({
-            routeToNextScreen()
+            startActivity(Intent(this, LandingActivity::class.java))
+            finish()
         }, 400)
-    }
-
-    private fun routeToNextScreen() {
-        val currentUser = FirebaseAuth.getInstance().currentUser
-        // Signed-out borrowers see the Landing page first; an existing session
-        // still goes straight to the dashboard.
-        val destination = if (currentUser != null) {
-            Intent(this, HomeActivity::class.java)
-        } else {
-            Intent(this, LandingActivity::class.java)
-        }
-        startActivity(destination)
-        finish()
     }
 }

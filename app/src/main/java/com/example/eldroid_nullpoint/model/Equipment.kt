@@ -5,8 +5,9 @@ import com.google.firebase.firestore.DocumentSnapshot
 /**
  * One SmartDock box and the equipment inside it: `equipment/{boxId}`.
  *
- * Written by the SmartDock tower / administrator side; the borrower app only
- * ever reads it.
+ * Created by the administrator side (or the dashboard's one-time seed) and moved
+ * between "available" and "borrowed" by the SmartDock tower - or, until the
+ * hardware exists, by the app's Borrow / Return actions via SmartDockRepository.
  */
 data class Equipment(
     val id: String = "",

@@ -3,8 +3,9 @@ package com.example.eldroid_nullpoint.model
 import com.google.firebase.firestore.DocumentSnapshot
 
 /**
- * One entry in the shared `transactions/{autoId}` log written by the SmartDock
- * tower whenever a card is tapped and an item leaves or returns to a box.
+ * One entry in the shared `transactions/{autoId}` log, appended whenever an item
+ * leaves or returns to a box - by the SmartDock tower after an RFID tap, or by the
+ * app's Borrow / Return actions while the tower is being built.
  */
 data class Transaction(
     val id: String = "",
