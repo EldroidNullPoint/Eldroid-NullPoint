@@ -28,6 +28,10 @@ class EquipmentDetailPresenter(
             return
         }
 
+        // Guard: don't register a second listener if one is already active
+        // (can happen when the confirm dialog dismisses and the Activity resumes).
+        if (listener != null) return
+
         if (DemoData.isDemoId(equipmentId)) {
             val demo = DemoData.equipmentById(equipmentId, currentUid)
             if (demo == null) view?.close() else bind(demo)
@@ -78,6 +82,9 @@ class EquipmentDetailPresenter(
 
         SmartDockRepository.returnItem(equipment.id, currentUid, borrowerName)
             .addOnSuccessListener { returned ->
+                // Clear submitting flag BEFORE showing toast so the snapshot
+                // listener that immediately fires sees isSubmitting = false and
+                // can correctly re-evaluate action buttons.
                 setSubmitting(false)
                 view?.showToast("${returned.name} returned to Box ${returned.boxNumber}")
             }

@@ -63,7 +63,7 @@ class BorrowConfirmationActivity : AppCompatActivity() {
 
         binding.btnViewItem.setOnClickListener {
             if (equipmentId.isNotBlank()) {
-                startActivity(EquipmentDetailActivity.intent(this, equipmentId))
+                startActivity(EquipmentDetailActivity.intent(this@BorrowConfirmationActivity, equipmentId))
             }
             finish()
         }

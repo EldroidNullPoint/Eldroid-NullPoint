@@ -4,7 +4,6 @@ import com.example.eldroid_nullpoint.model.AppNotification
 import com.example.eldroid_nullpoint.model.Equipment
 import com.example.eldroid_nullpoint.model.Transaction
 import com.example.eldroid_nullpoint.util.DemoData
-import com.example.eldroid_nullpoint.util.NotificationPrefs
 import com.example.eldroid_nullpoint.util.SmartDockRepository
 import com.example.eldroid_nullpoint.util.TimeFormat
 import com.google.firebase.firestore.FirebaseFirestore
@@ -33,7 +32,15 @@ class HomePresenter(
 
     override fun onStart(uid: String) {
         currentUid = uid
-        stopListening()
+
+        // If listeners are already active (e.g. resumed from EquipmentDetail after a
+        // borrow), just reload the greeting — the existing listeners keep the data live
+        // and we must not flash the loading spinner unnecessarily.
+        if (equipmentListener != null) {
+            loadGreeting()
+            return
+        }
+
         equipmentLoaded = false
         transactionsLoaded = false
         view?.showLoading()
