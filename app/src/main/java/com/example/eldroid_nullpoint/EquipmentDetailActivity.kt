@@ -204,6 +204,21 @@ class EquipmentDetailActivity : AppCompatActivity(), EquipmentDetailContract.Vie
         }
     }
 
+    override fun showErrorDialog(message: String) {
+        androidx.appcompat.app.AlertDialog.Builder(this)
+            .setTitle("🔍 Error Diagnostic")
+            .setMessage(message)
+            .setPositiveButton("COPY TO CLIPBOARD") { _, _ ->
+                val clipboard = getSystemService(Context.CLIPBOARD_SERVICE) as android.content.ClipboardManager
+                val clip = android.content.ClipData.newPlainText("Error Diagnostic", message)
+                clipboard.setPrimaryClip(clip)
+                Toast.makeText(this, "Error copied to clipboard", Toast.LENGTH_SHORT).show()
+            }
+            .setNegativeButton("CLOSE", null)
+            .setCancelable(true)
+            .show()
+    }
+
     override fun navigateToBorrowConfirmation(receipt: SmartDockRepository.BorrowReceipt) {
         startActivity(BorrowConfirmationActivity.intent(this, receipt))
     }

@@ -40,6 +40,12 @@ class HomeActivity : AppCompatActivity(), HomeContract.View {
     private lateinit var activityAdapter: TransactionAdapter
 
     private var currentUid: String = ""
+    
+    private val debugListener: (String) -> Unit = { message ->
+        runOnUiThread {
+            binding.tvDebugBanner.text = "🔍 $message"
+        }
+    }
 
     private val notificationPermission =
         registerForActivityResult(ActivityResultContracts.RequestPermission()) { granted ->
@@ -63,10 +69,12 @@ class HomeActivity : AppCompatActivity(), HomeContract.View {
         setupRecyclerViews()
         setupHeaderActions()
         setupReminders()
+        setupFirebaseConnectionMonitor()
     }
 
     override fun onStart() {
         super.onStart()
+        com.example.eldroid_nullpoint.util.DebugBroadcaster.addListener(debugListener)
         if (currentUid.isNotBlank()) presenter.onStart(currentUid)
     }
 
@@ -77,6 +85,7 @@ class HomeActivity : AppCompatActivity(), HomeContract.View {
 
     override fun onDestroy() {
         super.onDestroy()
+        com.example.eldroid_nullpoint.util.DebugBroadcaster.removeListener(debugListener)
         presenter.detach()
     }
 
@@ -142,6 +151,20 @@ class HomeActivity : AppCompatActivity(), HomeContract.View {
         ) {
             notificationPermission.launch(Manifest.permission.POST_NOTIFICATIONS)
         }
+    }
+
+    private fun setupFirebaseConnectionMonitor() {
+        // Test Firestore connectivity
+        com.google.firebase.firestore.FirebaseFirestore.getInstance()
+            .collection("equipment")
+            .limit(1)
+            .get()
+            .addOnSuccessListener {
+                com.example.eldroid_nullpoint.util.DebugBroadcaster.broadcast("Firestore: ✅ CONNECTED (read test passed)")
+            }
+            .addOnFailureListener { e ->
+                com.example.eldroid_nullpoint.util.DebugBroadcaster.broadcast("Firestore: ❌ FAILED - ${e.javaClass.simpleName}: ${e.message}")
+            }
     }
 
     // ---------------------------------------------------------------

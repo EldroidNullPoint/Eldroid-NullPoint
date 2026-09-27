@@ -11,6 +11,7 @@ interface EquipmentDetailContract {
         fun showActionArea(visible: Boolean)
         fun setSubmitting(submitting: Boolean)
         fun showToast(message: String)
+        fun showErrorDialog(message: String)
         fun navigateToBorrowConfirmation(receipt: com.example.eldroid_nullpoint.util.SmartDockRepository.BorrowReceipt)
         fun close()
     }
