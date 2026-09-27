@@ -64,13 +64,17 @@ class EquipmentDetailPresenter(
         if (isSubmitting) return
         setSubmitting(true)
 
+        android.util.Log.d("DetailPresenter", "Attempting borrow: id=${equipment.id} uid=$currentUid name=$borrowerName")
+
         SmartDockRepository.borrow(equipment.id, currentUid, borrowerName)
             .addOnSuccessListener { receipt ->
+                android.util.Log.d("DetailPresenter", "Borrow SUCCESS: ${receipt.equipment.name}")
                 setSubmitting(false)
                 DueCheckWorker.runNow(context)
                 view?.navigateToBorrowConfirmation(receipt)
             }
             .addOnFailureListener { error ->
+                android.util.Log.e("DetailPresenter", "Borrow FAILURE", error)
                 setSubmitting(false)
                 view?.showToast(resolveActionError(error))
             }
@@ -81,15 +85,16 @@ class EquipmentDetailPresenter(
         if (isSubmitting) return
         setSubmitting(true)
 
+        android.util.Log.d("DetailPresenter", "Attempting return: id=${equipment.id} uid=$currentUid name=$borrowerName")
+
         SmartDockRepository.returnItem(equipment.id, currentUid, borrowerName)
             .addOnSuccessListener { returned ->
-                // Clear submitting flag BEFORE showing toast so the snapshot
-                // listener that immediately fires sees isSubmitting = false and
-                // can correctly re-evaluate action buttons.
+                android.util.Log.d("DetailPresenter", "Return SUCCESS: ${returned.name}")
                 setSubmitting(false)
                 view?.showToast("${returned.name} returned to Box ${returned.boxNumber}")
             }
             .addOnFailureListener { error ->
+                android.util.Log.e("DetailPresenter", "Return FAILURE", error)
                 setSubmitting(false)
                 view?.showToast(resolveActionError(error))
             }
@@ -133,19 +138,22 @@ class EquipmentDetailPresenter(
 
     private fun resolveActionError(error: Throwable): String {
         val loanError = SmartDockRepository.loanExceptionOf(error)
+        // Log full error so Logcat shows the exact cause
+        android.util.Log.e("DetailPresenter", "Action error: ${error.javaClass.simpleName}: ${error.message}", error)
+
         return when {
             loanError?.borrowCheck == LoanPolicy.BorrowCheck.ALREADY_BORROWED ->
-                "This item has already been borrowed"
+                "Already borrowed"
             loanError?.borrowCheck == LoanPolicy.BorrowCheck.NOT_FOUND ||
                     loanError?.returnCheck == LoanPolicy.ReturnCheck.NOT_FOUND ->
                 "Equipment not found"
             loanError?.returnCheck == LoanPolicy.ReturnCheck.NOT_YOURS ->
-                "You cannot return an item you didn't borrow"
+                "Not your item"
             loanError?.returnCheck == LoanPolicy.ReturnCheck.NOT_BORROWED ->
-                "This item is not currently borrowed"
+                "Not currently borrowed"
             SmartDockRepository.isPermissionDenied(error) ->
-                "Permission denied. Contact your administrator."
-            else -> "Action failed. Please try again."
+                "PERMISSION_DENIED — Firestore rules blocked this write. Check rules."
+            else -> "FAILED: ${error.javaClass.simpleName}: ${error.message}"
         }
     }
 

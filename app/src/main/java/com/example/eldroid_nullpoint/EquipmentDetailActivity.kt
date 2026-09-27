@@ -191,7 +191,17 @@ class EquipmentDetailActivity : AppCompatActivity(), EquipmentDetailContract.Vie
     }
 
     override fun showToast(message: String) {
-        Toast.makeText(this, message, Toast.LENGTH_LONG).show()
+        // Use a dialog instead of toast so error messages are fully readable
+        // and don't auto-dismiss before you can read them
+        if (message.length > 60 || message.startsWith("FAILED") || message.startsWith("PERMISSION")) {
+            androidx.appcompat.app.AlertDialog.Builder(this)
+                .setTitle("Debug Info")
+                .setMessage(message)
+                .setPositiveButton("OK", null)
+                .show()
+        } else {
+            Toast.makeText(this, message, Toast.LENGTH_LONG).show()
+        }
     }
 
     override fun navigateToBorrowConfirmation(receipt: SmartDockRepository.BorrowReceipt) {
